@@ -37,7 +37,7 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       Record<never, never>,
       | '//(index)'
-      | '//second'
+      | '//chat/[chatId]'
     >,
     '//(index)': RouteRecordInfo<
       '//(index)',
@@ -46,18 +46,11 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
-    '//second': RouteRecordInfo<
-      '//second',
-      '/second',
-      Record<never, never>,
-      Record<never, never>,
-      | never
-    >,
-    '/[...path]': RouteRecordInfo<
-      '/[...path]',
-      '/:path(.*)',
-      { path: ParamValue<true> },
-      { path: ParamValue<false> },
+    '//chat/[chatId]': RouteRecordInfo<
+      '//chat/[chatId]',
+      '/chat/:chatId',
+      { chatId: ParamValue<true> },
+      { chatId: ParamValue<false> },
       | never
     >,
   }
@@ -77,7 +70,7 @@ declare module 'vue-router/auto-routes' {
       routes:
         | '/'
         | '//(index)'
-        | '//second'
+        | '//chat/[chatId]'
       views:
         | 'default'
       pathParamNames:
@@ -91,21 +84,13 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
-    'src/pages/index/second.vue': {
+    'src/pages/index/chat/[chatId].vue': {
       routes:
-        | '//second'
+        | '//chat/[chatId]'
       views:
         | never
       pathParamNames:
-        | never
-    }
-    'src/pages/[...path].vue': {
-      routes:
-        | '/[...path]'
-      views:
-        | never
-      pathParamNames:
-        | 'path'
+        | 'chatId'
     }
   }
 
