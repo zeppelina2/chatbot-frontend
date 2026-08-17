@@ -1,11 +1,16 @@
 <template>
   <q-list>
-    <q-item-label header>
+    <!-- <q-item-label header>
       Диалоги
-    </q-item-label>
+    </q-item-label> -->
 
-    <q-item v-for="dialogue in dialogues" :key="dialogue.id" clickable :to="`/chat/${dialogue.id}`"
-      active-class="dialogue-item--active">
+    <q-item
+      v-for="dialogue in mockDialogues"
+      :key="dialogue.chat_id"
+      clickable
+      :to="`/chat/${dialogue.chat_id}`"
+      active-class="dialogue-item--active"
+    >
       <q-item-section>
         <q-item-label>
           {{ dialogue.name }}
@@ -16,5 +21,12 @@
 </template>
 
 <script setup lang="ts">
-import { dialogues } from "@/mocks/dialogues";
+import { mockDialogues } from "@/mocks/dialogues";
 </script>
+
+<style scoped lang="scss">
+.dialogue-item--active {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+</style>

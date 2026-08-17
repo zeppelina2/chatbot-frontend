@@ -6,9 +6,10 @@
 
 <script setup lang="ts">
 import { useRoute } from "vue-router";
+import { computed } from "vue";
 
 const route = useRoute("//chat/[chatId]");
 
-const chatId = route.params.chatId;
-console.log("route.params", route.params)
+const chatId = computed(() => route.params.chatId);
+
 </script>
