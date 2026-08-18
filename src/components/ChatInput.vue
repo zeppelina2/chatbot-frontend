@@ -62,6 +62,12 @@ const sendMessage = () => {
 
   &__field {
     flex: 1;
+    max-height: 300px;
+
+    :deep(textarea) {
+      max-height: 300px;
+      overflow-y: auto;
+    }
   }
 
   &__send {

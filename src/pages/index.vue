@@ -2,7 +2,14 @@
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
       <q-toolbar>
-        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
+        <q-btn
+          flat
+          dense
+          round
+          icon="menu"
+          aria-label="Menu"
+          @click="toggleLeftDrawer"
+        />
 
         <q-toolbar-title>
           Магнус Фортий Ирриматис
@@ -46,15 +53,19 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 import DialogueList from "@/components/DialogueList.vue";
 
 const leftDrawerOpen = ref(false);
+const router = useRouter();
 
 const toggleLeftDrawer = () => {
   leftDrawerOpen.value = !leftDrawerOpen.value;
 };
 
-const createChat = () => {};
+const createChat = () => {
+  router.push("/");
+};
 </script>
 
 <style scoped lang="scss">
