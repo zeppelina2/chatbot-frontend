@@ -1,20 +1,20 @@
 <template>
-  <!-- Сообщение пользователя -->
   <q-item
     v-if="message.role === Role.USER"
     class="chat__user-item"
   >
+    <!-- Сообщение пользователя -->
     <div
       class="chat__user-message"
     >
       {{ message.content }}
     </div>
   </q-item>
-  <!-- Сообщение ассистента -->
   <q-item
     v-else-if="message.role === Role.ASSISTANT"
     class="chat__item"
   >
+    <!-- Сообщение ассистента -->
     <div
       class="chat__assistant-message markdown-body"
       v-html="renderMarkdown(message.content)"
@@ -55,7 +55,6 @@ const renderMarkdown = (content: string) => {
     max-width: 70%;
   }
   &__user-message {
-    min-width: 300px;
     padding: 10px 16px;
     border-radius: 18px 18px 4px 18px;
     background: #1976d2;

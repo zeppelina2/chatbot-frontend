@@ -38,17 +38,21 @@ const handleSendMessage = (message: string) => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 24px;
+  padding: 24px 24px 0 24px;
 
   &__messages {
     flex: 1;
     min-height: 0;
     overflow-y: auto;
+    margin: 0 0 20px;
   }
 
   &__input {
     flex-shrink: 0;
-    padding-top: 16px;
+    position: sticky;
+    bottom: 0;
+    padding: 0 0 24px;
+    background-color: white;
   }
 }
 </style>
