@@ -11,25 +11,54 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import MessageList from "@/components/MessageList.vue";
 import ChatInput from "@/components/ChatInput.vue";
-
-import { mockDialogues } from "@/mocks/dialogues";
+import Dialogue from "@/types/dialogue";
+import Message from "@/types/message";
+import { apiDialogueList } from "@/api/dialogues";
+import { apiGenerateWithTools } from "@/api/llm";
 
 const route = useRoute("//chat/[chatId]");
 
 const chatId = computed(() => route.params.chatId);
 
-const dialogue = computed(() =>
-  mockDialogues.find((dialogue) => dialogue.chat_id === chatId.value),
+const dialogues = ref<Dialogue[]>([]);
+
+const messages = computed<Message[]>(() => {
+  const dialogue = dialogues.value.find(
+    (dialogue) => dialogue.chat_id === chatId.value,
+  );
+
+  return dialogue?.messages ?? [];
+});
+
+const loadDialogues = async () => {
+  try {
+    const response = await apiDialogueList();
+
+    dialogues.value = response.data.dialogues;
+  } catch (error) {
+    console.error("Ошибка загрузки диалогов:", error);
+  }
+};
+
+watch(
+  chatId,
+  async () => {
+    await loadDialogues();
+  },
+  { immediate: true },
 );
 
-const messages = computed(() => dialogue.value?.messages ?? []);
-
-const handleSendMessage = (message: string) => {
-  console.log("Отправляем сообщение:", message);
+const handleSendMessage = async (message: string) => {
+  try {
+    await apiGenerateWithTools(chatId.value, message);
+    loadDialogues();
+  } catch (error) {
+    console.error("Ошибка загрузки диалогов:", error);
+  }
 };
 </script>
 

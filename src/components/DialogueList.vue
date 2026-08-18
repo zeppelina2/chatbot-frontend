@@ -5,7 +5,7 @@
     </q-item-label> -->
 
     <q-item
-      v-for="dialogue in mockDialogues"
+      v-for="dialogue in dialogues"
       :key="dialogue.chat_id"
       clickable
       :to="`/chat/${dialogue.chat_id}`"
@@ -21,7 +21,20 @@
 </template>
 
 <script setup lang="ts">
-import { mockDialogues } from "@/mocks/dialogues";
+import { ref, onMounted } from "vue";
+import Dialogue from "@/types/dialogue";
+import { apiDialogueList } from "@/api/dialogues";
+
+const dialogues = ref<Dialogue[]>([]);
+
+onMounted(async () => {
+  try {
+    const response = await apiDialogueList();
+    dialogues.value = response.data.dialogues;
+  } catch (error) {
+    console.error("Ошибка загрузки диалогов:", error);
+  }
+});
 </script>
 
 <style scoped lang="scss">
