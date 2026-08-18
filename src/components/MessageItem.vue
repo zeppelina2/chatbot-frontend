@@ -52,9 +52,10 @@ const renderMarkdown = (content: string) => {
   &__user-item {
     padding: 0;
     justify-content: flex-end;
+    max-width: 70%;
   }
   &__user-message {
-    max-width: 70%;
+    min-width: 300px;
     padding: 10px 16px;
     border-radius: 18px 18px 4px 18px;
     background: #1976d2;
@@ -64,7 +65,6 @@ const renderMarkdown = (content: string) => {
   }
 
   &__assistant-message {
-    max-width: 80%;
     color: #1f1f1f;
     overflow-wrap: anywhere;
   }
