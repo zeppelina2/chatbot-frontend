@@ -33,14 +33,13 @@ const props = defineProps<{
   display: flex;
   justify-content: center;
   height: 100%;
-  padding: 24px;
 
   &__messages {
     display: flex;
     flex-direction: column;
     width: 100%;
     max-width: 900px;
-    gap: 16px;
+    gap: 30px;
   }
 
   &__message {
@@ -48,6 +47,7 @@ const props = defineProps<{
     width: 100%;
 
     &--user {
+      width: 100%;
       justify-content: flex-end;
     }
 

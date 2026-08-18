@@ -1,19 +1,25 @@
 <template>
-  <q-item>
-    <!-- Сообщение пользователя -->
+  <!-- Сообщение пользователя -->
+  <q-item
+    v-if="message.role === Role.USER"
+    class="chat__user-item"
+  >
     <div
-      v-if="message.role === Role.USER"
       class="chat__user-message"
     >
       {{ message.content }}
     </div>
-
-    <!-- Сообщение ассистента -->
+  </q-item>
+  <!-- Сообщение ассистента -->
+  <q-item
+    v-else-if="message.role === Role.ASSISTANT"
+    class="chat__item"
+  >
     <div
-      v-else-if="message.role === Role.ASSISTANT"
       class="chat__assistant-message markdown-body"
       v-html="renderMarkdown(message.content)"
-    />
+    >
+    </div>
   </q-item>
 </template>
 
@@ -40,6 +46,13 @@ const renderMarkdown = (content: string) => {
 
 <style scoped lang="scss">
 .chat {
+  &__item {
+    padding: 0;
+  }
+  &__user-item {
+    padding: 0;
+    justify-content: flex-end;
+  }
   &__user-message {
     max-width: 70%;
     padding: 10px 16px;
