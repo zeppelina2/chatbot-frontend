@@ -15,30 +15,21 @@ import { computed, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import MessageList from "@/components/MessageList.vue";
 import ChatInput from "@/components/ChatInput.vue";
-import Dialogue from "@/types/dialogue";
 import Message from "@/types/message";
-import { apiDialogueList } from "@/api/dialogues";
+import { apiMessageList } from "@/api/messages";
 import { apiGenerateWithTools } from "@/api/llm";
 
 const route = useRoute("//chat/[chatId]");
 
 const chatId = computed(() => route.params.chatId);
 
-const dialogues = ref<Dialogue[]>([]);
+const messages = ref<Message[]>([]);
 
-const messages = computed<Message[]>(() => {
-  const dialogue = dialogues.value.find(
-    (dialogue) => dialogue.chat_id === chatId.value,
-  );
-
-  return dialogue?.messages ?? [];
-});
-
-const loadDialogues = async () => {
+const loadMessages = async (chatId: string) => {
   try {
-    const response = await apiDialogueList();
+    const response = await apiMessageList(chatId);
 
-    dialogues.value = response.data.dialogues;
+    messages.value = response.data.messages;
   } catch (error) {
     console.error("Ошибка загрузки диалогов:", error);
   }
@@ -47,7 +38,7 @@ const loadDialogues = async () => {
 watch(
   chatId,
   async () => {
-    await loadDialogues();
+    await loadMessages(chatId.value);
   },
   { immediate: true },
 );
@@ -55,7 +46,7 @@ watch(
 const handleSendMessage = async (message: string) => {
   try {
     await apiGenerateWithTools(chatId.value, message);
-    loadDialogues();
+    loadMessages(chatId.value);
   } catch (error) {
     console.error("Ошибка загрузки диалогов:", error);
   }
