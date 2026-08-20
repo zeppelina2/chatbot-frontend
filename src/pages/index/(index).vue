@@ -1,16 +1,33 @@
 <template>
   <q-page class="flex flex-center">
     <div class="start-page">
-      <ChatInput @send="onSend" />
+      <ChatInput @send="handleSendMessage" />
     </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
-import ChatInput from "@/components/ChatInput.vue";
+import { useRouter } from "vue-router";
 
-const onSend = (message: string) => {
-  console.log("Отправлено:", message);
+import ChatInput from "@/components/ChatInput.vue";
+import { apiCreateDialogue } from "@/api/dialogues";
+
+const router = useRouter();
+
+const handleSendMessage = async (message: string) => {
+  try {
+    const newChat = await apiCreateDialogue();
+    const newChatId = newChat.data.chat_id;
+
+    await router.push({
+      path: `/chat/${newChatId}`,
+      state: {
+        initialMessage: message,
+      },
+    });
+  } catch (error) {
+    console.error("Ошибка загрузки диалогов:", error);
+  }
 };
 </script>
 

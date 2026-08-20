@@ -9,3 +9,11 @@ export const apiDialogueList = async () => (
     },
   })
 );
+
+export const apiCreateDialogue = async () => (
+  await api.post("/dialogues", null, {
+    params: {
+      user_id: TEST_USER_ID,
+    },
+  })
+);

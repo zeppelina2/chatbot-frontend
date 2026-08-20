@@ -85,11 +85,29 @@ const renderMarkdown = (content: string) => {
     margin-top: 20px;
     margin-bottom: 12px;
     line-height: 1.3;
+    font-weight: 600;
+  }
+
+  :deep(h1) {
+    font-size: 24px;
+  }
+
+  :deep(h2) {
+    font-size: 20px;
+  }
+
+  :deep(h3) {
+    font-size: 18px;
+  }
+
+  :deep(h4) {
+    font-size: 16px;
   }
 
   :deep(h1:first-child),
   :deep(h2:first-child),
-  :deep(h3:first-child) {
+  :deep(h3:first-child),
+  :deep(h4:first-child) {
     margin-top: 0;
   }
 

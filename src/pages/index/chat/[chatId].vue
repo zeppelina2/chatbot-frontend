@@ -13,9 +13,11 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { useRoute } from "vue-router";
+
 import MessageList from "@/components/MessageList.vue";
 import ChatInput from "@/components/ChatInput.vue";
 import Message from "@/types/message";
+
 import { apiMessageList } from "@/api/messages";
 import { apiGenerateWithTools } from "@/api/llm";
 
@@ -35,22 +37,54 @@ const loadMessages = async (chatId: string) => {
   }
 };
 
+const sendMessage = async (message: string) => {
+  await apiGenerateWithTools(chatId.value, message);
+  await loadMessages(chatId.value);
+};
+
+const handleSendMessage = async (message: string) => {
+  try {
+    await sendMessage(message);
+  } catch (error) {
+    console.error("Ошибка отправки сообщения:", error);
+  }
+};
+
+
+const handleInitialMessage = async () => {
+  // в initialMessage придет сообщение,
+  // если пользователь пришел со страницы создания нового диалога
+  const initialMessage = history.state.initialMessage as string | undefined;
+
+  if (!initialMessage) {
+    return;
+  }
+
+  // Убираем сообщение из history.state,
+  // чтобы не отправить его повторно
+  history.replaceState(
+    {
+      ...history.state,
+      initialMessage: undefined,
+    },
+    "",
+  );
+
+  try {
+    await sendMessage(initialMessage);
+  } catch (error) {
+    console.error("Ошибка отправки первоначального сообщения:", error);
+  }
+};
+
 watch(
   chatId,
   async () => {
     await loadMessages(chatId.value);
+    await handleInitialMessage();
   },
   { immediate: true },
 );
-
-const handleSendMessage = async (message: string) => {
-  try {
-    await apiGenerateWithTools(chatId.value, message);
-    loadMessages(chatId.value);
-  } catch (error) {
-    console.error("Ошибка загрузки диалогов:", error);
-  }
-};
 </script>
 
 <style scoped lang="scss">
