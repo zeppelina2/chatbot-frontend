@@ -1,9 +1,9 @@
-export interface Chat {
+export interface ChatApiType {
   id: string;
   name: string;
 }
 
-export interface Message {
+export interface MessageApiType {
   id: string;
   chat_id: string;
   role: "user" | "assistant";

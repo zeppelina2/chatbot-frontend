@@ -1,12 +1,12 @@
-import Message from "./message";
+import MessageType from "./message";
 
-interface Dialogue {
+interface DialogueType {
   chat_id: string;
   user_id: string;
-  messages: Message[]
+  messages: MessageType[]
   name: string;
   created_at: string
   updated_at: string
 }
 
-export default Dialogue
+export default DialogueType

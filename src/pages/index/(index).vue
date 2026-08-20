@@ -10,14 +10,16 @@
 import { useRouter } from "vue-router";
 
 import ChatInput from "@/components/ChatInput.vue";
-import { apiCreateDialogue } from "@/api/dialogues";
+import { useDialoguesStore } from "@/stores/dialogues-store";
+
+const dialoguesStore = useDialoguesStore();
 
 const router = useRouter();
 
 const handleSendMessage = async (message: string) => {
   try {
-    const newChat = await apiCreateDialogue();
-    const newChatId = newChat.data.chat_id;
+    const newChat = await dialoguesStore.createDialogue();
+    const newChatId = newChat.chat_id;
 
     await router.push({
       path: `/chat/${newChatId}`,

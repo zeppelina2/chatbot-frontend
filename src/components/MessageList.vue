@@ -2,15 +2,10 @@
   <q-list>
     <div class="chat">
       <div class="chat__messages">
-        <div
-          v-for="message in messages"
-          :key="message.message_id"
-          class="chat__message"
-          :class="{
-            'chat__message--user': message.role === Role.USER,
-            'chat__message--assistant': message.role === Role.ASSISTANT,
-          }"
-        >
+        <div v-for="message in messages" :key="message.message_id" class="chat__message" :class="{
+          'chat__message--user': message.role === Role.USER,
+          'chat__message--assistant': message.role === Role.ASSISTANT,
+        }">
           <MessageItem :message="message" />
         </div>
       </div>
@@ -21,10 +16,10 @@
 <script setup lang="ts">
 import MessageItem from "@/components/MessageItem.vue";
 import Role from "@/types/roles";
-import Message from "@/types/message";
+import MessageType from "@/types/message";
 
 const props = defineProps<{
-  messages: Message[];
+  messages: MessageType[];
 }>();
 </script>
 

@@ -16,7 +16,7 @@ import { useRoute } from "vue-router";
 
 import MessageList from "@/components/MessageList.vue";
 import ChatInput from "@/components/ChatInput.vue";
-import Message from "@/types/message";
+import MessageType from "@/types/message";
 
 import { apiMessageList } from "@/api/messages";
 import { apiGenerateWithTools } from "@/api/llm";
@@ -25,7 +25,7 @@ const route = useRoute("//chat/[chatId]");
 
 const chatId = computed(() => route.params.chatId);
 
-const messages = ref<Message[]>([]);
+const messages = ref<MessageType[]>([]);
 
 const loadMessages = async (chatId: string) => {
   try {

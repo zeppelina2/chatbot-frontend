@@ -1,6 +1,6 @@
 import Role from "./roles";
 
-interface Message {
+interface MessageType {
   content: string;
   role: Role;
   message_id: string;
@@ -8,4 +8,4 @@ interface Message {
   updated_at: string;
 }
 
-export default Message;
+export default MessageType;

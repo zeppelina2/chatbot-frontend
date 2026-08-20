@@ -1,24 +1,13 @@
 <template>
-  <q-item
-    v-if="message.role === Role.USER"
-    class="chat__user-item"
-  >
+  <q-item v-if="message.role === Role.USER" class="chat__user-item">
     <!-- Сообщение пользователя -->
-    <div
-      class="chat__user-message"
-    >
+    <div class="chat__user-message">
       {{ message.content }}
     </div>
   </q-item>
-  <q-item
-    v-else-if="message.role === Role.ASSISTANT"
-    class="chat__item"
-  >
+  <q-item v-else-if="message.role === Role.ASSISTANT" class="chat__item">
     <!-- Сообщение ассистента -->
-    <div
-      class="chat__assistant-message markdown-body"
-      v-html="renderMarkdown(message.content)"
-    >
+    <div class="chat__assistant-message markdown-body" v-html="renderMarkdown(message.content)">
     </div>
   </q-item>
 </template>
@@ -27,10 +16,10 @@
 import MarkdownIt from "markdown-it";
 
 import Role from "@/types/roles";
-import Message from "@/types/message";
+import MessageType from "@/types/message";
 
 const props = defineProps<{
-  message: Message;
+  message: MessageType;
 }>();
 
 const markdown = new MarkdownIt({
@@ -49,11 +38,13 @@ const renderMarkdown = (content: string) => {
   &__item {
     padding: 0;
   }
+
   &__user-item {
     padding: 0;
     justify-content: flex-end;
     max-width: 70%;
   }
+
   &__user-message {
     padding: 10px 16px;
     border-radius: 18px 18px 4px 18px;

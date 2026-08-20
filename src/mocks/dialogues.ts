@@ -1,7 +1,7 @@
-import Dialogue from "@/types/dialogue";
+import DialogueType from "@/types/dialogue";
 import Role from "@/types/roles";
 
-export const mockDialogues: Dialogue[] = [
+export const mockDialogues: DialogueType[] = [
   {
     chat_id: "chat-001",
     user_id: "user-001",

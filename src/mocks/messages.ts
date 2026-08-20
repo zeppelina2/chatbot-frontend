@@ -1,7 +1,7 @@
-import Message from "@/types/message";
+import MessageType from "@/types/message";
 import Role from "@/types/roles";
 
-export const mockMessages: Message[] = [
+export const mockMessages: MessageType[] = [
   {
     content: "Привет! Расскажи мне о мире Ойкумены.",
     role: Role.USER,

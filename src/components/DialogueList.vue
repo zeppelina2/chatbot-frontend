@@ -5,7 +5,7 @@
     </q-item-label> -->
 
     <q-item
-      v-for="dialogue in dialogues"
+      v-for="dialogue in dialoguesStore.dialogues"
       :key="dialogue.chat_id"
       clickable
       :to="`/chat/${dialogue.chat_id}`"
@@ -21,19 +21,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import Dialogue from "@/types/dialogue";
-import { apiDialogueList } from "@/api/dialogues";
+import { onMounted } from "vue";
+import { useDialoguesStore } from "@/stores/dialogues-store";
 
-const dialogues = ref<Dialogue[]>([]);
+const dialoguesStore = useDialoguesStore();
 
-onMounted(async () => {
-  try {
-    const response = await apiDialogueList();
-    dialogues.value = response.data.dialogues;
-  } catch (error) {
-    console.error("Ошибка загрузки диалогов:", error);
-  }
+onMounted(() => {
+  dialoguesStore.loadDialogues();
 });
 </script>
 
