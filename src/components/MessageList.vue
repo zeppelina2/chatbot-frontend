@@ -18,6 +18,8 @@ import MessageItem from "@/components/MessageItem.vue";
 import Role from "@/types/roles";
 import MessageType from "@/types/message";
 
+// сделать так, чтобы чат прокручивался автоматом вниз к самому свежему сообщению
+
 const props = defineProps<{
   messages: MessageType[];
 }>();

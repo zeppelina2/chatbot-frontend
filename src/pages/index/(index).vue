@@ -18,7 +18,7 @@ const router = useRouter();
 
 const handleSendMessage = async (message: string) => {
   try {
-    const newChat = await dialoguesStore.createDialogue();
+    const newChat = await dialoguesStore.createDialogue(message);
     const newChatId = newChat.chat_id;
 
     await router.push({

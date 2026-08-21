@@ -3,6 +3,7 @@ import { defineStore, acceptHMRUpdate } from "pinia";
 import DialogueType from "@/types/dialogue";
 
 import { apiDialogueList, apiCreateDialogue } from "@/api/dialogues";
+import { apiGenerateDialogueName } from "@/api/llm";
 
 
 export const useDialoguesStore = defineStore("dialogues", {
@@ -21,11 +22,13 @@ export const useDialoguesStore = defineStore("dialogues", {
       }
     },
 
-    async createDialogue() {
+    async createDialogue(firstUserMessage: string) {
       try {
         const response = await apiCreateDialogue();
+        const newChatId = response.data.chat_id;
+        const newDialogueWithGenerateNameResponse = await apiGenerateDialogueName(newChatId, firstUserMessage);
 
-        const { message, ...dialogue } = response.data;
+        const { message, ...dialogue } = newDialogueWithGenerateNameResponse.data;
 
         this.dialogues.unshift(dialogue);
 
