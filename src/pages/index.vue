@@ -45,7 +45,7 @@
       </div>
     </q-drawer>
 
-    <q-page-container>
+    <q-page-container class="page__container">
       <router-view />
     </q-page-container>
   </q-layout>
@@ -69,6 +69,10 @@ const createChat = () => {
 </script>
 
 <style scoped lang="scss">
+.page__container {
+  padding-top: 0!important;
+}
+
 .drawer {
   display: flex;
   flex-direction: column;

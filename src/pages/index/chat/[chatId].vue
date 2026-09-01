@@ -1,6 +1,10 @@
 <template>
   <q-page class="chat-page">
-    <div class="chat-page__messages">
+    <div
+      ref="containerRef"
+      class="chat-page__messages"
+      @scroll="updateScrollPosition"
+    >
       <MessageList :messages="messages" />
     </div>
 
@@ -17,15 +21,27 @@ import { useRoute } from "vue-router";
 import MessageList from "@/components/MessageList.vue";
 import ChatInput from "@/components/ChatInput.vue";
 import MessageType from "@/types/message";
-
+import { useMessagesStore } from "@/stores/messages-store";
 import { apiMessageList } from "@/api/messages";
 import { apiGenerateWithTools } from "@/api/llm";
+import { useChatScroll } from "@/composables/useChatScroll";
+import { useLoaderStore } from "@/stores/loader-store";
+import { LoadingType } from "@/types/loading";
 
 const route = useRoute("//chat/[chatId]");
 
 const chatId = computed(() => route.params.chatId);
 
 const messages = ref<MessageType[]>([]);
+
+const {
+  containerRef,
+  isNearBottom,
+  updateScrollPosition,
+  scrollToBottom,
+} = useChatScroll();
+
+const loaderStore = useLoaderStore();
 
 const loadMessages = async (chatId: string) => {
   try {
@@ -38,8 +54,16 @@ const loadMessages = async (chatId: string) => {
 };
 
 const sendMessage = async (message: string) => {
+  await scrollToBottom("smooth");
+  loaderStore.start(LoadingType.GENERATION);
+
   await apiGenerateWithTools(chatId.value, message);
   await loadMessages(chatId.value);
+  loaderStore.stop(LoadingType.GENERATION);
+
+  if (isNearBottom.value) {
+    await scrollToBottom("smooth");
+  }
 };
 
 const handleSendMessage = async (message: string) => {
@@ -50,25 +74,14 @@ const handleSendMessage = async (message: string) => {
   }
 };
 
-
 const handleInitialMessage = async () => {
-  // в initialMessage придет сообщение,
-  // если пользователь пришел со страницы создания нового диалога
-  const initialMessage = history.state.initialMessage as string | undefined;
+  // если пользователь пришел со страницы создания нового диалога, в сторе будет сообщение
+  const messagesStore = useMessagesStore();
+  const initialMessage = messagesStore.consumeInitialMessage();
 
   if (!initialMessage) {
     return;
   }
-
-  // Убираем сообщение из history.state,
-  // чтобы не отправить его повторно
-  history.replaceState(
-    {
-      ...history.state,
-      initialMessage: undefined,
-    },
-    "",
-  );
 
   try {
     await sendMessage(initialMessage);
@@ -82,6 +95,8 @@ watch(
   async () => {
     await loadMessages(chatId.value);
     await handleInitialMessage();
+
+    await scrollToBottom();
   },
   { immediate: true },
 );
@@ -91,14 +106,15 @@ watch(
 .chat-page {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  padding: 24px 24px 0 24px;
+  height: 100vh;
+  overflow: hidden;
+  padding: 74px 24px 0 24px;
 
   &__messages {
     flex: 1;
     min-height: 0;
     overflow-y: auto;
-    margin: 0 0 20px;
+    padding: 0 0 20px;
   }
 
   &__input {

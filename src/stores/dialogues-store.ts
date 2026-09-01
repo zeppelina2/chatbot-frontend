@@ -5,7 +5,6 @@ import DialogueType from "@/types/dialogue";
 import { apiDialogueList, apiCreateDialogue } from "@/api/dialogues";
 import { apiGenerateDialogueName } from "@/api/llm";
 
-
 export const useDialoguesStore = defineStore("dialogues", {
   state: () => ({
     dialogues: [] as DialogueType[],
@@ -28,7 +27,7 @@ export const useDialoguesStore = defineStore("dialogues", {
         const newChatId = response.data.chat_id;
         const newDialogueWithGenerateNameResponse = await apiGenerateDialogueName(newChatId, firstUserMessage);
 
-        const { message, ...dialogue } = newDialogueWithGenerateNameResponse.data;
+        const { message: _message, ...dialogue } = newDialogueWithGenerateNameResponse.data;
 
         this.dialogues.unshift(dialogue);
 
