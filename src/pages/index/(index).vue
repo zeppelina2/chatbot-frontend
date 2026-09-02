@@ -2,9 +2,9 @@
   <q-page class="flex flex-center">
     <div class="start-page">
       <TypingLoader
-        v-if="loaderStore.isLoading(LoadingType.GENERATION)"
+        v-if="loaderStore.isLoading(LoadingType.CREATE_DIALOGUES)"
       />
-      <ChatInput @send="handleSendMessage" />
+      <ChatInput @send="handleCreateDialogue" />
     </div>
   </q-page>
 </template>
@@ -12,7 +12,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 
-import ChatInput from "@/components/ChatInput.vue";
+import ChatInput from "@/components/ui/ChatInput.vue";
 import { useDialoguesStore } from "@/stores/dialogues-store";
 import { useMessagesStore } from "@/stores/messages-store";
 import { useLoaderStore } from "@/stores/loader-store";
@@ -25,14 +25,14 @@ const dialoguesStore = useDialoguesStore();
 
 const router = useRouter();
 
-const handleSendMessage = async (message: string) => {
+const handleCreateDialogue = async (message: string) => {
   try {
-    loaderStore.start(LoadingType.GENERATION);
-    const newChat = await dialoguesStore.createDialogue(message);
+    loaderStore.start(LoadingType.CREATE_DIALOGUES);
+    const newChat = await dialoguesStore.createDialogue();
     const newChatId = newChat.chat_id;
     const messagesStore = useMessagesStore();
     messagesStore.setInitialMessage(message);
-    loaderStore.stop(LoadingType.GENERATION);
+    loaderStore.stop(LoadingType.CREATE_DIALOGUES);
 
     await router.push(`/chat/${newChatId}`);
   } catch (error) {

@@ -21,19 +21,39 @@ export const useDialoguesStore = defineStore("dialogues", {
       }
     },
 
-    async createDialogue(firstUserMessage: string) {
+    async createDialogue() {
       try {
         const response = await apiCreateDialogue();
-        const newChatId = response.data.chat_id;
-        const newDialogueWithGenerateNameResponse = await apiGenerateDialogueName(newChatId, firstUserMessage);
 
-        const { message: _message, ...dialogue } = newDialogueWithGenerateNameResponse.data;
+        const { message: _message, ...dialogue } = response.data;
 
         this.dialogues.unshift(dialogue);
 
         return dialogue;
       } catch (error) {
         console.error("Ошибка создания диалога:", error);
+        throw error;
+      }
+    },
+
+    async generateDialogueName(firstUserMessage: string, chatId: string) {
+      try {
+        const newDialogueWithGenerateNameResponse = await apiGenerateDialogueName(chatId, firstUserMessage);
+
+        const { message: _message, ...dialogue } = newDialogueWithGenerateNameResponse.data;
+
+        const dialogueIndex = this.dialogues.findIndex(
+          (item) => item.chat_id === chatId
+        );
+
+        if (dialogueIndex !== -1 && this.dialogues[dialogueIndex]) {
+          this.dialogues[dialogueIndex].name = dialogue.name;
+          return dialogue;
+        }
+
+        throw "Ошибка генерации имени диалога: Диалог не найден по id"
+      } catch (error) {
+        console.error("Ошибка генерации имени диалога:", error);
         throw error;
       }
     },

@@ -21,12 +21,13 @@ import { computed, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import MessageList from "@/components/MessageList.vue";
-import ChatInput from "@/components/ChatInput.vue";
+import ChatInput from "@/components/ui/ChatInput.vue";
 import MessageType from "@/types/message";
 import BaseScrollArea from "@/components/ui/BaseScrollArea.vue";
 import { useMessagesStore } from "@/stores/messages-store";
 import { apiMessageList } from "@/api/messages";
 import { apiGenerateWithTools } from "@/api/llm";
+import { useDialoguesStore } from "@/stores/dialogues-store";
 import { useChatScroll } from "@/composables/useChatScroll";
 import { useLoaderStore } from "@/stores/loader-store";
 import { LoadingType } from "@/types/loading";
@@ -45,6 +46,8 @@ const {
   scrollToBottom,
 } = useChatScroll(containerRef);
 
+const dialoguesStore = useDialoguesStore();
+
 const loaderStore = useLoaderStore();
 
 const loadMessages = async (chatId: string) => {
@@ -59,10 +62,13 @@ const loadMessages = async (chatId: string) => {
 
 const sendMessage = async (message: string) => {
   await scrollToBottom("smooth");
+
   loaderStore.start(LoadingType.GENERATION);
 
+  await dialoguesStore.generateDialogueName(message, chatId.value);
   await apiGenerateWithTools(chatId.value, message);
   await loadMessages(chatId.value);
+
   loaderStore.stop(LoadingType.GENERATION);
 
   if (isNearBottom.value) {
