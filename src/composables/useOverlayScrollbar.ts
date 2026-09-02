@@ -8,7 +8,7 @@ import {
 } from "vue";
 
 const MIN_THUMB_HEIGHT = 32;
-const HIDE_DELAY = 2500;
+const HIDE_DELAY = 1000;
 
 export const useOverlayScrollbar = (
   containerRef: Ref<HTMLElement | null>,

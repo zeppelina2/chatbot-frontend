@@ -29,9 +29,9 @@
           @click="createChat"
         />
 
-        <div class="drawer__dialogues">
+        <BaseScrollArea class="drawer__dialogues">
           <DialogueList />
-        </div>
+        </BaseScrollArea>
 
         <div class="drawer__footer">
           <q-btn
@@ -54,6 +54,8 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+
+import BaseScrollArea from "@/components/ui/BaseScrollArea.vue";
 import DialogueList from "@/components/DialogueList.vue";
 
 const leftDrawerOpen = ref(false);
@@ -70,7 +72,7 @@ const createChat = () => {
 
 <style scoped lang="scss">
 .page__container {
-  padding-top: 0!important;
+  padding-top: 0 !important;
 }
 
 .drawer {
@@ -79,14 +81,13 @@ const createChat = () => {
   height: 100%;
 
   &__new-chat {
-    width: 100%;
     flex-shrink: 0;
+    width: 100%;
   }
 
   &__dialogues {
     flex: 1;
     min-height: 0;
-    overflow-y: auto;
   }
 
   &__footer {

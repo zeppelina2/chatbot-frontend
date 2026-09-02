@@ -1,9 +1,5 @@
 <template>
   <q-list>
-    <!-- <q-item-label header>
-      Диалоги
-    </q-item-label> -->
-
     <q-item
       v-for="dialogue in dialoguesStore.dialogues"
       :key="dialogue.chat_id"
