@@ -1,12 +1,14 @@
 <template>
   <q-page class="chat-page">
-    <div
-      ref="containerRef"
-      class="chat-page__messages"
+    <BaseScrollArea
+      ref="scrollAreaRef"
+      class="chat-page__scroll-area"
       @scroll="updateScrollPosition"
     >
-      <MessageList :messages="messages" />
-    </div>
+      <div class="chat-page__messages">
+        <MessageList :messages="messages" />
+      </div>
+    </BaseScrollArea>
 
     <div class="chat-page__input">
       <ChatInput @send="handleSendMessage" />
@@ -21,6 +23,7 @@ import { useRoute } from "vue-router";
 import MessageList from "@/components/MessageList.vue";
 import ChatInput from "@/components/ChatInput.vue";
 import MessageType from "@/types/message";
+import BaseScrollArea from "@/components/ui/BaseScrollArea.vue";
 import { useMessagesStore } from "@/stores/messages-store";
 import { apiMessageList } from "@/api/messages";
 import { apiGenerateWithTools } from "@/api/llm";
@@ -29,17 +32,18 @@ import { useLoaderStore } from "@/stores/loader-store";
 import { LoadingType } from "@/types/loading";
 
 const route = useRoute("//chat/[chatId]");
-
 const chatId = computed(() => route.params.chatId);
-
 const messages = ref<MessageType[]>([]);
+const scrollAreaRef = ref<InstanceType<typeof BaseScrollArea> | null>(null);
+const containerRef = computed<HTMLElement | null>(() => {
+  return scrollAreaRef.value?.getContainer() ?? null;
+});
 
 const {
-  containerRef,
   isNearBottom,
   updateScrollPosition,
   scrollToBottom,
-} = useChatScroll();
+} = useChatScroll(containerRef);
 
 const loaderStore = useLoaderStore();
 
@@ -110,18 +114,19 @@ watch(
   overflow: hidden;
   padding: 74px 24px 0 24px;
 
-  &__messages {
+  &__scroll-area {
     flex: 1;
-    min-height: 0;
-    overflow-y: auto;
+  }
+
+  &__messages {
     padding: 0 0 20px;
   }
 
   &__input {
-    flex-shrink: 0;
     position: sticky;
     bottom: 0;
-    padding: 0 0 24px;
+    flex-shrink: 0;
+    padding-bottom: 24px;
     background-color: white;
   }
 }

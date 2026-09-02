@@ -1,7 +1,8 @@
-import { nextTick, ref } from "vue";
+import { nextTick, ref, type Ref } from "vue";
 
-export const useChatScroll = () => {
-  const containerRef = ref<HTMLElement | null>(null);
+export const useChatScroll = (externalContainerRef?: Ref<HTMLElement | null>) => {
+  const internalContainerRef = ref<HTMLElement | null>(null);
+  const containerRef = externalContainerRef ?? internalContainerRef;
 
   const isNearBottom = ref(true);
 
