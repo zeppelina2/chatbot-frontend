@@ -33,7 +33,7 @@
 import MessageItem from "@/components/MessageItem.vue";
 import Role from "@/types/roles";
 import MessageType from "@/types/message";
-import TypingLoader from "@/components/TypingLoader.vue";
+import TypingLoader from "@/components/ui/TypingLoader.vue";
 import { useLoaderStore } from "@/stores/loader-store";
 import { LoadingType } from "@/types/loading";
 

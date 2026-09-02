@@ -17,7 +17,7 @@ import { useDialoguesStore } from "@/stores/dialogues-store";
 import { useMessagesStore } from "@/stores/messages-store";
 import { useLoaderStore } from "@/stores/loader-store";
 import { LoadingType } from "@/types/loading";
-import TypingLoader from "@/components/TypingLoader.vue";
+import TypingLoader from "@/components/ui/TypingLoader.vue";
 
 const loaderStore = useLoaderStore();
 

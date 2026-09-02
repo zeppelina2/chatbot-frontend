@@ -60,6 +60,7 @@ const renderMarkdown = (content: string) => {
   }
 }
 
+// стили для маркдаун разметки ответа от llm
 .markdown-body {
   :deep(p) {
     margin: 0 0 12px;
