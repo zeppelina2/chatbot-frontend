@@ -6,7 +6,10 @@
       @scroll="updateScrollPosition"
     >
       <div class="chat-page__messages">
-        <MessageList :messages="messages" />
+        <MessageList
+          :messages="messages"
+          :chat-id="chatId"
+        />
       </div>
     </BaseScrollArea>
 
@@ -29,7 +32,6 @@ import { apiGenerateWithTools } from "@/api/llm";
 import { useDialoguesStore } from "@/stores/dialogues-store";
 import { useChatScroll } from "@/composables/useChatScroll";
 import { useLoaderStore } from "@/stores/loader-store";
-import { LoadingType } from "@/types/loading";
 
 const route = useRoute("//chat/[chatId]");
 const chatId = computed(() => route.params.chatId);
@@ -75,7 +77,7 @@ const sendMessage = async (
     "sending",
   );
 
-  loaderStore.start(LoadingType.GENERATION);
+  loaderStore.startGeneration(currentChatId);
 
   try {
     await scrollToBottom("smooth");
@@ -104,7 +106,7 @@ const sendMessage = async (
 
     throw error;
   } finally {
-    loaderStore.stop(LoadingType.GENERATION);
+    loaderStore.stopGeneration(currentChatId);
   }
 };
 

@@ -15,14 +15,12 @@
           <MessageItem :message="message" />
         </div>
         <div
-          v-if="loaderStore.isLoading(LoadingType.GENERATION)"
+          v-if="loaderStore.isGenerationLoading(props.chatId)"
           :id="`message-loader`"
           class="chat__loader"
           :class="Role.ASSISTANT"
         >
-          <TypingLoader
-            v-if="loaderStore.isLoading(LoadingType.GENERATION)"
-          />
+          <TypingLoader />
         </div>
       </div>
     </div>
@@ -35,12 +33,12 @@ import Role from "@/types/roles";
 import MessageType from "@/types/message";
 import TypingLoader from "@/components/ui/TypingLoader.vue";
 import { useLoaderStore } from "@/stores/loader-store";
-import { LoadingType } from "@/types/loading";
 
 const loaderStore = useLoaderStore();
 
 const props = defineProps<{
   messages: MessageType[];
+  chatId: string;
 }>();
 </script>
 

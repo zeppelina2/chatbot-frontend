@@ -6,13 +6,17 @@ export const useLoaderStore = defineStore("loader", {
     loading: {
       [LoadingType.DIALOGUES]: false,
       [LoadingType.MESSAGES]: false,
-      [LoadingType.GENERATION]: false,
-    } as Record<LoadingType, boolean>,
+    } as Partial<Record<LoadingType, boolean>>,
+
+    generationByChatId: {} as Record<string, boolean>,
   }),
 
   getters: {
     isLoading: (state) => (type: LoadingType) =>
-      state.loading[type],
+      Boolean(state.loading[type]),
+
+    isGenerationLoading: (state) => (chatId: string) =>
+      Boolean(state.generationByChatId[chatId]),
   },
 
   actions: {
@@ -22,6 +26,14 @@ export const useLoaderStore = defineStore("loader", {
 
     stop(type: LoadingType) {
       this.loading[type] = false;
+    },
+
+    startGeneration(chatId: string) {
+      this.generationByChatId[chatId] = true;
+    },
+
+    stopGeneration(chatId: string) {
+      delete this.generationByChatId[chatId];
     },
   },
 });
