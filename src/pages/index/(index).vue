@@ -31,7 +31,7 @@ const handleCreateDialogue = async (message: string) => {
     const newChat = await dialoguesStore.createDialogue();
     const newChatId = newChat.chat_id;
     const messagesStore = useMessagesStore();
-    messagesStore.setInitialMessage(message);
+    messagesStore.addOptimisticMessage(newChat.chat_id, message);
     loaderStore.stop(LoadingType.CREATE_DIALOGUES);
 
     await router.push(`/chat/${newChatId}`);

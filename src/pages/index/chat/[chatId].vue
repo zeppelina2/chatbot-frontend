@@ -22,9 +22,8 @@ import { useRoute } from "vue-router";
 
 import MessageList from "@/components/MessageList.vue";
 import ChatInput from "@/components/ui/ChatInput.vue";
-import MessageType from "@/types/message";
 import BaseScrollArea from "@/components/ui/BaseScrollArea.vue";
-import { useMessagesStore } from "@/stores/messages-store";
+import { useMessagesStore, ClientMessage } from "@/stores/messages-store";
 import { apiMessageList } from "@/api/messages";
 import { apiGenerateWithTools } from "@/api/llm";
 import { useDialoguesStore } from "@/stores/dialogues-store";
@@ -34,7 +33,10 @@ import { LoadingType } from "@/types/loading";
 
 const route = useRoute("//chat/[chatId]");
 const chatId = computed(() => route.params.chatId);
-const messages = ref<MessageType[]>([]);
+const messagesStore = useMessagesStore();
+const messages = computed(() => {
+  return messagesStore.getMessages(chatId.value);
+});
 const scrollAreaRef = ref<InstanceType<typeof BaseScrollArea> | null>(null);
 const containerRef = computed<HTMLElement | null>(() => {
   return scrollAreaRef.value?.getContainer() ?? null;
@@ -50,61 +52,112 @@ const dialoguesStore = useDialoguesStore();
 
 const loaderStore = useLoaderStore();
 
-const loadMessages = async (chatId: string) => {
+const loadMessages = async (currentChatId: string) => {
   try {
-    const response = await apiMessageList(chatId);
+    const response = await apiMessageList(currentChatId);
 
-    messages.value = response.data.messages;
+    messagesStore.setMessages(
+      currentChatId,
+      response.data.messages,
+    );
   } catch (error) {
-    console.error("Ошибка загрузки диалогов:", error);
+    console.error("Ошибка загрузки сообщений:", error);
   }
 };
 
-const sendMessage = async (message: string) => {
-  await scrollToBottom("smooth");
+const sendMessage = async (
+  currentChatId: string,
+  optimisticMessage: ClientMessage,
+) => {
+  messagesStore.setMessageStatus(
+    currentChatId,
+    optimisticMessage.message_id,
+    "sending",
+  );
 
   loaderStore.start(LoadingType.GENERATION);
 
-  await dialoguesStore.generateDialogueName(message, chatId.value);
-  await apiGenerateWithTools(chatId.value, message);
-  await loadMessages(chatId.value);
-
-  loaderStore.stop(LoadingType.GENERATION);
-
-  if (isNearBottom.value) {
+  try {
     await scrollToBottom("smooth");
+
+    await dialoguesStore.generateDialogueName(
+      optimisticMessage.content,
+      currentChatId,
+    );
+
+    await apiGenerateWithTools(
+      currentChatId,
+      optimisticMessage.content,
+    );
+
+    await loadMessages(currentChatId);
+
+    if (isNearBottom.value) {
+      await scrollToBottom("smooth");
+    }
+  } catch (error) {
+    messagesStore.setMessageStatus(
+      currentChatId,
+      optimisticMessage.message_id,
+      "error",
+    );
+
+    throw error;
+  } finally {
+    loaderStore.stop(LoadingType.GENERATION);
   }
 };
 
-const handleSendMessage = async (message: string) => {
+const handleSendMessage = async (content: string) => {
+  const currentChatId = chatId.value;
+
+  const optimisticMessage =
+    messagesStore.addOptimisticMessage(currentChatId, content);
+
   try {
-    await sendMessage(message);
+    await sendMessage(currentChatId, optimisticMessage);
   } catch (error) {
     console.error("Ошибка отправки сообщения:", error);
   }
 };
 
-const handleInitialMessage = async () => {
-  // если пользователь пришел со страницы создания нового диалога, в сторе будет сообщение
-  const messagesStore = useMessagesStore();
-  const initialMessage = messagesStore.consumeInitialMessage();
+const handleInitialMessage = async (
+  currentChatId: string,
+): Promise<boolean> => {
+  // если пользователь пришел со страницы создания нового диалога,
+  // в сторе будет сообщение со статусом "pending"
+  const pendingMessage =
+    messagesStore.getPendingMessage(currentChatId);
 
-  if (!initialMessage) {
-    return;
+  if (!pendingMessage) {
+    return false;
   }
 
   try {
-    await sendMessage(initialMessage);
+    await sendMessage(currentChatId, pendingMessage);
   } catch (error) {
-    console.error("Ошибка отправки первоначального сообщения:", error);
+    console.error(
+      "Ошибка отправки первоначального сообщения:",
+      error,
+    );
   }
+
+  return true;
 };
 
 watch(
   chatId,
-  async () => {
-    await loadMessages(chatId.value);
-    await handleInitialMessage();
+  async (currentChatId) => {
+    if (!currentChatId) {
+      return;
+    }
+
+    const hasInitialMessage =
+      await handleInitialMessage(currentChatId);
+
+    if (!hasInitialMessage) {
+      await loadMessages(currentChatId);
+    }
 
     await scrollToBottom();
   },
