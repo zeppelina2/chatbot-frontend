@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 import MessageType from "@/types/message";
 import Role from "@/types/roles";
 
-export type SendingStatus = "pending" | "sending" | "error";
+export type SendingStatus = "pending" | "sending" | "streaming" | "sent" | "error";
 export interface ClientMessage extends MessageType {
   sendingStatus?: SendingStatus;
 }
@@ -76,6 +76,42 @@ export const useMessagesStore = defineStore("messages", {
       if (message) {
         message.sendingStatus = "error";
       }
+    },
+
+    addStreamingMessage(chatId: string): ClientMessage {
+      const message: ClientMessage = {
+        message_id: crypto.randomUUID(),
+        content: "",
+        role: Role.ASSISTANT,
+        sendingStatus: "streaming",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      if (!this.messagesByChatId[chatId]) {
+        this.messagesByChatId[chatId] = [];
+      }
+
+      this.messagesByChatId[chatId].push(message);
+
+      return message;
+    },
+
+    updateMessageContent(
+      chatId: string,
+      messageId: string,
+      content: string,
+    ) {
+      const message = this.messagesByChatId[chatId]?.find(
+        (item) => item.message_id === messageId,
+      );
+
+      if (!message) {
+        return;
+      }
+
+      message.content = content;
+      message.updated_at = new Date().toISOString();
     },
   },
 });

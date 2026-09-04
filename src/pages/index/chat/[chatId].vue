@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, nextTick } from "vue";
 import { useRoute } from "vue-router";
 
 import MessageList from "@/components/MessageList.vue";
@@ -54,6 +54,51 @@ const dialoguesStore = useDialoguesStore();
 
 const loaderStore = useLoaderStore();
 
+const animateAssistantMessage = async (
+  currentChatId: string,
+  content: string,
+) => {
+  const streamingMessage =
+    messagesStore.addStreamingMessage(currentChatId);
+
+  const characters = Array.from(content);
+
+  // Ограничиваем количество обновлений примерно до 300,
+  // чтобы длинные ответы не печатались несколько минут.
+  const chunkSize = Math.max(
+    1,
+    Math.ceil(characters.length / 300),
+  );
+
+  for (let index = chunkSize; index <= characters.length; index += chunkSize) {
+    const shouldScroll = isNearBottom.value;
+
+    messagesStore.updateMessageContent(
+      currentChatId,
+      streamingMessage.message_id,
+      characters.slice(0, index).join(""),
+    );
+
+    await nextTick();
+
+    if (shouldScroll) {
+      await scrollToBottom();
+    }
+
+    await new Promise<void>((resolve) => {
+      window.setTimeout(resolve, 16);
+    });
+  }
+
+  // Последнее обновление необходимо, если длина текста
+  // не делится на chunkSize без остатка.
+  messagesStore.updateMessageContent(
+    currentChatId,
+    streamingMessage.message_id,
+    content,
+  );
+};
+
 const loadMessages = async (currentChatId: string) => {
   try {
     const response = await apiMessageList(currentChatId);
@@ -71,32 +116,26 @@ const sendMessage = async (
   currentChatId: string,
   optimisticMessage: ClientMessage,
 ) => {
-  messagesStore.setMessageStatus(
-    currentChatId,
-    optimisticMessage.message_id,
-    "sending",
-  );
-
-  loaderStore.startGeneration(currentChatId);
-
   try {
     await scrollToBottom("smooth");
 
-    await dialoguesStore.generateDialogueName(
-      optimisticMessage.content,
-      currentChatId,
-    );
-
-    await apiGenerateWithTools(
+    const response = await apiGenerateWithTools(
       currentChatId,
       optimisticMessage.content,
     );
 
+    // Ответ уже получен, генерация закончилась —
+    // вместо лоадера начинаем показывать текст.
+    loaderStore.stopGeneration(currentChatId);
+
+    await animateAssistantMessage(
+      currentChatId,
+      response.data.content,
+    );
+
+    // После анимации заменяем временные сообщения
+    // реальными сообщениями с сервера.
     await loadMessages(currentChatId);
-
-    if (isNearBottom.value) {
-      await scrollToBottom("smooth");
-    }
   } catch (error) {
     messagesStore.setMessageStatus(
       currentChatId,
@@ -116,6 +155,14 @@ const handleSendMessage = async (content: string) => {
   const optimisticMessage =
     messagesStore.addOptimisticMessage(currentChatId, content);
 
+  messagesStore.setMessageStatus(
+    currentChatId,
+    optimisticMessage.message_id,
+    "sending",
+  );
+
+  loaderStore.startGeneration(currentChatId);
+
   try {
     await sendMessage(currentChatId, optimisticMessage);
   } catch (error) {
@@ -130,6 +177,19 @@ const handleInitialMessage = async (
   // если пользователь пришел со страницы создания нового диалога,
   // в сторе будет сообщение со статусом "pending"
   try {
+    loaderStore.startGeneration(currentChatId);
+
+    messagesStore.setMessageStatus(
+      currentChatId,
+      pendingMessage.message_id,
+      "sending",
+    );
+
+    await dialoguesStore.generateDialogueName(
+      pendingMessage.content,
+      currentChatId,
+    );
+
     await sendMessage(currentChatId, pendingMessage);
   } catch (error) {
     console.error(
