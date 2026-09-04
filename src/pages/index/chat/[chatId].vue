@@ -125,16 +125,10 @@ const handleSendMessage = async (content: string) => {
 
 const handleInitialMessage = async (
   currentChatId: string,
+  pendingMessage: ClientMessage
 ): Promise<boolean> => {
   // если пользователь пришел со страницы создания нового диалога,
   // в сторе будет сообщение со статусом "pending"
-  const pendingMessage =
-    messagesStore.getPendingMessage(currentChatId);
-
-  if (!pendingMessage) {
-    return false;
-  }
-
   try {
     await sendMessage(currentChatId, pendingMessage);
   } catch (error) {
@@ -154,10 +148,14 @@ watch(
       return;
     }
 
-    const hasInitialMessage =
-      await handleInitialMessage(currentChatId);
+    const pendingMessage = messagesStore.getPendingMessage(currentChatId);
+    const sendingMessage = messagesStore.getSendingMessage(currentChatId);
+    const hasInitialMessage = !!pendingMessage;
+    const hasSendingMessage = !!sendingMessage;
 
-    if (!hasInitialMessage) {
+    if (hasInitialMessage) {
+      await handleInitialMessage(currentChatId, pendingMessage);
+    } else if (!hasSendingMessage) {
       await loadMessages(currentChatId);
     }
 

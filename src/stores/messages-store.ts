@@ -24,6 +24,11 @@ export const useMessagesStore = defineStore("messages", {
         (message) => message.sendingStatus === "pending",
       );
     },
+    getSendingMessage: (state) => (chatId: string) => {
+      return state.messagesByChatId[chatId]?.find(
+        (message) => message.sendingStatus === "sending",
+      );
+    },
   },
 
   actions: {

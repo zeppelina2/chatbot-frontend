@@ -8,7 +8,6 @@ export const useChatScroll = (externalContainerRef?: Ref<HTMLElement | null>) =>
 
   const updateScrollPosition = () => {
     const container = containerRef?.value;
-    console.log("containerRef", containerRef)
 
     if (!container) return;
 
