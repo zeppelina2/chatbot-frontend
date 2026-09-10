@@ -96,9 +96,9 @@ const isGenerationLoading = computed(() =>
   }
 
   &__loader-author {
-    color: var(--text-accent);
     font-family: var(--font-accent);
-    font-size: 14px;
+    color: var(--text-accent);
+    font-size: 16px;
     font-weight: var(--font-accent-weight);
   }
 }
