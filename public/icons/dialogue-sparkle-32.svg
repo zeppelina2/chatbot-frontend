@@ -1,0 +1,49 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="32"
+  height="32"
+  viewBox="0 0 32 32"
+  fill="none"
+  role="img"
+  aria-labelledby="title"
+>
+  <title id="title">Магическая звезда</title>
+
+  <defs>
+    <linearGradient
+      id="fire-gold"
+      x1="5"
+      y1="5"
+      x2="27"
+      y2="27"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop stop-color="#F2B544" />
+      <stop offset="1" stop-color="#C87538" />
+    </linearGradient>
+  </defs>
+
+  <path
+    d="M15.5 5C15.85 10.85 20.15 15.15 26 15.5C20.15 15.85 15.85 20.15 15.5 26C15.15 20.15 10.85 15.85 5 15.5C10.85 15.15 15.15 10.85 15.5 5Z"
+    stroke="url(#fire-gold)"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <path
+    d="M24.5 4.5C24.63 6.55 25.95 7.87 28 8C25.95 8.13 24.63 9.45 24.5 11.5C24.37 9.45 23.05 8.13 21 8C23.05 7.87 24.37 6.55 24.5 4.5Z"
+    stroke="url(#fire-gold)"
+    stroke-width="1.25"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <path
+    d="M7.5 21C7.62 22.88 8.62 23.88 10.5 24C8.62 24.12 7.62 25.12 7.5 27C7.38 25.12 6.38 24.12 4.5 24C6.38 23.88 7.38 22.88 7.5 21Z"
+    stroke="url(#fire-gold)"
+    stroke-width="1.25"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>

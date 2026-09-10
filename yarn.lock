@@ -224,6 +224,11 @@
   dependencies:
     eslint-visitor-keys "^3.4.3"
 
+"@fontsource/manrope@^5.3.0":
+  version "5.3.0"
+  resolved "https://registry.yarnpkg.com/@fontsource/manrope/-/manrope-5.3.0.tgz#31a08e9299e654f9d8f33af80d467cceff295861"
+  integrity sha512-obJ1Dv3+uCA6HlHgW8u4BGYxJR9In2HW7gjJhlflEvkrj1X1iSEwu0fToL+JYGC/FEKFfIz1sBuPduvcL2gIAA==
+
 "@intlify/bundle-utils@11.2.4":
   version "11.2.4"
   resolved "https://registry.yarnpkg.com/@intlify/bundle-utils/-/bundle-utils-11.2.4.tgz#99fd1eeab485592566efbe91738215060a1a58c7"

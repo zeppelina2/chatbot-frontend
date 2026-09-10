@@ -1,5 +1,5 @@
 <template>
-  <q-page class="flex flex-center">
+  <q-page class="flex flex-center page-wr">
     <div class="start-page">
       <TypingLoader
         v-if="loaderStore.isLoading(LoadingType.CREATE_DIALOGUES)"
@@ -46,5 +46,9 @@ const handleCreateDialogue = async (message: string) => {
   width: 100%;
   max-width: 900px;
   padding: 16px;
+}
+
+.page-wr {
+  padding-top: 66px;
 }
 </style>

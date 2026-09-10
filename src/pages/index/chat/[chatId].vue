@@ -231,22 +231,44 @@ watch(
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
-  padding: 74px 24px 0 24px;
+  padding-top: 66px;
+  color: var(--text-primary);
+  background:
+    radial-gradient(
+      circle at 82% 0%,
+      var(--chat-background-glow),
+      transparent 30%
+    ),
+    var(--surface-page);
 
   &__scroll-area {
     flex: 1;
+    min-height: 0;
   }
 
   &__messages {
-    padding: 0 0 20px;
+    min-height: 100%;
+    padding: 0 24px 24px;
   }
 
   &__input {
-    position: sticky;
-    bottom: 0;
     flex-shrink: 0;
-    padding-bottom: 24px;
-    background-color: white;
+    padding: 0 24px 24px;
+    background-color: var(--surface-page);
+  }
+}
+
+@media (max-width: 600px) {
+  .chat-page {
+    &__messages {
+      padding-right: 16px;
+      padding-bottom: 20px;
+      padding-left: 16px;
+    }
+
+    &__input {
+      padding: 12px 16px 16px;
+    }
   }
 }
 </style>

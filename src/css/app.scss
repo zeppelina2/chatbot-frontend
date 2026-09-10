@@ -1,4 +1,127 @@
-// app global css
+@import "@fontsource/manrope/400.css";
+@import "@fontsource/manrope/500.css";
+// @import "@fontsource/manrope/600.css";
+@import "@fontsource/manrope/700.css";
+// @import "@fontsource/manrope/800.css";
+
+:root {
+  color-scheme: light;
+
+  // Шрифты
+  // --font-primary: "Roboto", sans-serif;
+  --font-primary: "Manrope", "Roboto", sans-serif;
+  --font-accent: "Manrope", "Roboto", sans-serif;
+  --font-bold-weight: 700;
+  --font-accent-weight: 500;
+
+  // Поверхности
+  --surface-page: #fbf8f1;
+  --surface-sidebar: #eeeade;
+  --surface-input: #fffdf8;
+  --surface-hover: #e4e0d2;
+  --surface-active: #e6dbe9;
+  --surface-positive: #b579ec;
+
+  // Текст
+  --text-primary: #3c2717; //#292633;
+  --text-accent: #895723;
+  --text-secondary: #3c2717;
+  --text-muted: #8a8390;
+  --text-on-primary: #fff9eb;
+
+  // Границы
+  --border-accent: rgb(200, 117, 56);
+  --border-primary: #d5cbbb;
+  --border-hover: #bba988;
+  --border-divider: #d8d2c7; // #e4ded2;
+
+  // Эффекты
+  --focus-ring: rgb(81 55 95 / 10%);
+  --shadow-color: rgb(75 58 41 / 10%);
+
+  --shadow-input:
+    0 10px 30px var(--shadow-color);
+
+  --shadow-input-focus:
+    0 10px 30px rgb(75 58 41 / 12%),
+    0 0 0 3px var(--focus-ring);
+
+  // Сообщение пользователя
+  --message-user-background: var(--surface-active);
+  --message-user-text: var(--text-primary);
+
+  // Аватар Магнуса
+  --avatar-background: var(--q-primary);
+  --avatar-text: var(--text-on-primary);
+  --avatar-shadow: 0 4px 14px rgb(200 117 56 / 24%);
+  --avatar-main-background: rgba(248, 168, 110, 0.24);
+  --avatar-main-shadow: 0px -2px 15px 10px rgba(248, 168, 110, 0.24);
+
+  // Markdown
+  --markdown-quote-background: #f6f1e7;
+  --markdown-code-background: #f1ece2;
+  --markdown-pre-background: #eee8dc;
+  --markdown-table-header: #f3eee4;
+  --markdown-table-border: #d9d0c1;
+
+  // Декоративный фон
+  --chat-background-glow: rgb(81 55 95 / 6%);
+}
+
+body.body--dark {
+  color-scheme: dark;
+
+  // Поверхности
+  --surface-page: #171625;
+  --surface-sidebar: #201e31;
+  --surface-input: #232132;
+  --surface-hover: #2a2739;
+  --surface-active: #3a2b47;
+
+  // Текст
+  --text-primary: #f2ecde;
+  --text-secondary: #c8c0ce;
+  --text-muted: #aaa3b8;
+  --text-on-primary: #fff9eb;
+
+  // Границы
+  --border-primary: #494357;
+  --border-hover: #6a6079;
+  --border-divider: #312e41;
+
+  // Эффекты
+  --focus-ring: rgb(201 167 215 / 16%);
+  --shadow-color: rgb(0 0 0 / 24%);
+
+  --shadow-input:
+    0 10px 30px var(--shadow-color);
+
+  --shadow-input-focus:
+    0 10px 30px rgb(0 0 0 / 28%),
+    0 0 0 3px var(--focus-ring);
+
+  --text-accent: #dec0e8;
+
+  --avatar-shadow: 0 4px 16px rgb(0 0 0 / 28%);
+  --avatar-main-shadow: 0px 0px 15px 10px rgb(0 0 0 / 28%);
+  --avatar-main-background: rgb(0 0 0 / 28%);
+
+  --markdown-quote-background: #211f30;
+  --markdown-code-background: #2c2939;
+  --markdown-pre-background: #201e2d;
+  --markdown-table-header: #2a2738;
+  --markdown-table-border: #494357;
+
+  // Декоративный фон
+  --chat-background-glow: rgb(201 167 215 / 8%);
+}
+
 body {
+  font-family: var(--font-primary);
   overflow: hidden;
+  color: var(--text-primary);
+  background-color: var(--surface-page);
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
 }

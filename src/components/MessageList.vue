@@ -1,26 +1,26 @@
 <template>
-  <q-list>
-    <div class="chat">
-      <div class="chat__messages">
-        <div
-          v-for="message in messages"
-          :key="message.message_id"
-          :id="`message-${message.message_id}`"
-          class="chat__message"
-          :class="{
-            'chat__message--user': message.role === Role.USER,
-            'chat__message--assistant': message.role === Role.ASSISTANT,
-          }"
-        >
-          <MessageItem :message="message" />
-        </div>
-        <div
-          v-if="loaderStore.isGenerationLoading(props.chatId)"
-          :id="`message-loader`"
-          class="chat__loader"
-          :class="Role.ASSISTANT"
-        >
+  <q-list class="message-list" :aria-busy="isGenerationLoading">
+    <div class="message-list__messages">
+      <div v-for="message in messages" :id="`message-${message.message_id}`" :key="message.message_id"
+        class="message-list__message">
+        <MessageItem :message="message" />
+      </div>
+
+      <div v-if="isGenerationLoading" id="message-loader" class="message-list__loader" role="status">
+        <q-avatar class="message-list__loader-avatar" aria-hidden="true">
+          <q-icon name="auto_awesome" />
+        </q-avatar>
+
+        <div class="message-list__loader-content">
+          <div class="message-list__loader-author">
+            Магнус Фортий Ирриматис
+          </div>
+
           <TypingLoader />
+
+          <span class="q-sr-only">
+            Магнус готовит ответ
+          </span>
         </div>
       </div>
     </div>
@@ -28,45 +28,91 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
+
 import MessageItem from "@/components/MessageItem.vue";
-import Role from "@/types/roles";
-import MessageType from "@/types/message";
 import TypingLoader from "@/components/ui/TypingLoader.vue";
 import { useLoaderStore } from "@/stores/loader-store";
 
-const loaderStore = useLoaderStore();
+import type MessageType from "@/types/message";
 
 const props = defineProps<{
   messages: MessageType[];
   chatId: string;
 }>();
+
+const loaderStore = useLoaderStore();
+
+const isGenerationLoading = computed(() =>
+  loaderStore.isGenerationLoading(props.chatId),
+);
 </script>
 
 <style scoped lang="scss">
-.chat {
-  display: flex;
-  justify-content: center;
-  height: 100%;
+.message-list {
+  width: 100%;
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 24px 0 32px;
+  box-sizing: border-box;
 
   &__messages {
     display: flex;
     flex-direction: column;
+    gap: 28px;
     width: 100%;
-    max-width: 900px;
-    gap: 30px;
   }
 
   &__message {
-    display: flex;
     width: 100%;
+  }
 
-    &--user {
-      width: 100%;
-      justify-content: flex-end;
+  &__loader {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+  }
+
+  &__loader-avatar {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    color: var(--avatar-text);
+    background-color: var(--avatar-background);
+    box-shadow: var(--avatar-shadow);
+
+    :deep(.q-icon) {
+      font-size: 17px;
+    }
+  }
+
+  &__loader-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  &__loader-author {
+    color: var(--text-accent);
+    font-family: var(--font-accent);
+    font-size: 14px;
+    font-weight: var(--font-accent-weight);
+  }
+}
+
+@media (max-width: 600px) {
+  .message-list {
+    padding: 20px 16px 28px;
+
+    &__messages {
+      gap: 24px;
     }
 
-    &--assistant {
-      justify-content: flex-start;
+    &__loader {
+      gap: 9px;
     }
   }
 }
