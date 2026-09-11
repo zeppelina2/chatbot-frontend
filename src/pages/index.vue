@@ -25,6 +25,7 @@
             Магнус готов отвечать
           </span>
         </q-toolbar-title>
+        <ThemeSwitcher />
         <img
           src="/icons/dialogue-sparkle-32.svg"
           width="25"
@@ -104,6 +105,7 @@ import { useRoute, useRouter } from "vue-router";
 
 import BaseScrollArea from "@/components/ui/BaseScrollArea.vue";
 import DialogueList from "@/components/DialogueList.vue";
+import ThemeSwitcher from "@/components/ui/ThemeSwitcher.vue";
 import { useDialoguesStore } from "@/stores/dialogues-store";
 
 const router = useRouter();
