@@ -69,9 +69,17 @@
         <div class="drawer__new-chat-wr">
           <button
             class="drawer__new-chat"
-            outline
             @click="createChat"
-          >Новый разговор</button>
+          >
+            <img
+              class="drawer__new-chat-icon"
+              src="/icons/feather.svg"
+              alt="Иконка с пером"
+              aria-hidden="true"
+            />
+
+            <span>Новый разговор</span>
+          </button>
         </div>
 
         <BaseScrollArea class="drawer__dialogues">
@@ -135,8 +143,6 @@ const toggleLeftDrawer = () => {
 
 const createChat = async () => {
   await router.push("/");
-
-  // leftDrawerOpen.value = false;
 };
 </script>
 
@@ -246,7 +252,10 @@ const createChat = async () => {
   }
 
   &__new-chat {
-    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
     width: 100%;
     min-height: 42px;
     border-radius: 11px;
@@ -255,14 +264,13 @@ const createChat = async () => {
     outline: 0;
     background-color: var(--surface-sidebar);
     cursor: pointer;
+    transition:
+      color 150ms ease,
+      background-color 150ms ease;
 
     &:hover {
       background-color: var(--surface-page);
       border-color: var(--border-hover);
-    }
-
-    :deep(.q-btn__content) {
-      gap: 4px;
     }
 
     &-wr {
