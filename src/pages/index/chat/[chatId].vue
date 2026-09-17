@@ -14,7 +14,10 @@
     </BaseScrollArea>
 
     <div class="chat-page__input">
-      <ChatInput @send="handleSendMessage" />
+      <ChatInput
+        @send="handleSendMessage"
+        :disabled="isGenerationLoading"
+      />
     </div>
   </q-page>
 </template>
@@ -53,6 +56,9 @@ const {
 const dialoguesStore = useDialoguesStore();
 
 const loaderStore = useLoaderStore();
+const isGenerationLoading = computed(() =>
+  loaderStore.isGenerationLoading(chatId.value)
+);
 
 const animateAssistantMessage = async (
   currentChatId: string,

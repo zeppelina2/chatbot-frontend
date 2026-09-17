@@ -1,19 +1,9 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header
-      bordered
-      class="app-header"
-    >
+  <q-layout view="lHh Lpr lFf" :class="{ 'layout--resizing': isResizing }">
+    <q-header bordered class="app-header">
       <q-toolbar class="app-header__toolbar">
-        <q-btn
-          class="app-header__menu lt-md"
-          flat
-          round
-          dense
-          icon="menu"
-          aria-label="Открыть меню"
-          @click="toggleLeftDrawer"
-        />
+        <q-btn class="app-header__menu lt-md" flat round dense icon="menu" aria-label="Открыть меню"
+          @click="toggleLeftDrawer" />
 
         <q-toolbar-title class="app-header__title">
           <span class="app-header__dialogue-name">
@@ -22,17 +12,12 @@
 
           <span class="app-header__status">
             <span class="app-header__status-dot"></span>
-            Магнус готов отвечать
+            Готов отвечать
           </span>
         </q-toolbar-title>
         <ThemeSwitcher />
-        <img
-          src="/icons/dialogue-sparkle-32.svg"
-          width="25"
-          height="25"
-          alt="active-dialogue-star"
-          aria-hidden="true"
-        />
+        <img src="/icons/dialogue-sparkle-32.svg" width="25" height="25" alt="active-dialogue-star"
+          aria-hidden="true" />
       </q-toolbar>
     </q-header>
 
@@ -41,18 +26,13 @@
       class="app-drawer"
       show-if-above
       bordered
-      :width="260"
+      :width="drawerWidth"
+      :breakpoint="1023"
     >
       <div class="drawer">
         <div class="drawer__brand">
-          <q-avatar
-            class="drawer__avatar"
-            size="38px"
-          >
-            <img
-              src="/icons/favicon-96x96.png"
-              alt=""
-            />
+          <q-avatar class="drawer__avatar" size="38px">
+            <img src="/icons/favicon-96x96.png" alt="" />
           </q-avatar>
 
           <div class="drawer__brand-text">
@@ -67,16 +47,8 @@
         </div>
 
         <div class="drawer__new-chat-wr">
-          <button
-            class="drawer__new-chat"
-            @click="createChat"
-          >
-            <img
-              class="drawer__new-chat-icon"
-              src="/icons/feather.svg"
-              alt="Иконка с пером"
-              aria-hidden="true"
-            />
+          <button class="drawer__new-chat" @click="createChat">
+            <img class="drawer__new-chat-icon" src="/icons/feather.svg" alt="Иконка с пером" aria-hidden="true" />
 
             <span>Новый разговор</span>
           </button>
@@ -88,16 +60,17 @@
 
         <div class="drawer__footer_wr">
           <div class="drawer__footer">
-            <q-btn
-              class="drawer__settings"
-              flat
-              no-caps
-              icon="settings"
-              align="left"
-              label="Настройки"
-            />
+            <q-btn class="drawer__settings" flat no-caps icon="settings" align="left" label="Настройки" />
           </div>
         </div>
+
+        <div class="drawer__resize-handle gt-sm" :class="{ 'drawer__resize-handle--active': isResizing }"
+          role="separator" aria-label="Ширина бокового меню" aria-orientation="vertical" :aria-valuenow="drawerWidth"
+          :aria-valuemin="MIN_DRAWER_WIDTH" :aria-valuemax="MAX_DRAWER_WIDTH" tabindex="0"
+          @pointerdown.prevent.stop="startResize" @pointermove="resizeDrawer" @pointerup="stopResize"
+          @pointercancel="stopResize" @lostpointercapture="stopResize"
+          @keydown.left.prevent="setDrawerWidth(drawerWidth - 10)"
+          @keydown.right.prevent="setDrawerWidth(drawerWidth + 10)"></div>
       </div>
     </q-drawer>
 
@@ -143,6 +116,61 @@ const toggleLeftDrawer = () => {
 
 const createChat = async () => {
   await router.push("/");
+};
+
+// код для ресайза бокового меню
+const MIN_DRAWER_WIDTH = 240;
+const MAX_DRAWER_WIDTH = 480;
+
+const drawerWidth = ref(260);
+const isResizing = ref(false);
+
+let startX = 0;
+let startWidth = 0;
+let activePointerId: number | null = null;
+
+const setDrawerWidth = (width: number) => {
+  drawerWidth.value = Math.min(
+    MAX_DRAWER_WIDTH,
+    Math.max(MIN_DRAWER_WIDTH, width),
+  );
+};
+
+const startResize = (event: PointerEvent) => {
+  if (!event.isPrimary || event.button !== 0) return;
+
+  const handle = event.currentTarget as HTMLElement;
+
+  startX = event.clientX;
+  startWidth = drawerWidth.value;
+  activePointerId = event.pointerId;
+
+  handle.setPointerCapture(event.pointerId);
+  isResizing.value = true;
+};
+
+const resizeDrawer = (event: PointerEvent) => {
+  if (
+    !isResizing.value ||
+    event.pointerId !== activePointerId
+  ) {
+    return;
+  }
+
+  setDrawerWidth(startWidth + event.clientX - startX);
+};
+
+const stopResize = (event: PointerEvent) => {
+  if (event.pointerId !== activePointerId) return;
+
+  const handle = event.currentTarget as HTMLElement;
+
+  isResizing.value = false;
+  activePointerId = null;
+
+  if (handle.hasPointerCapture(event.pointerId)) {
+    handle.releasePointerCapture(event.pointerId);
+  }
 };
 </script>
 
@@ -211,6 +239,7 @@ const createChat = async () => {
 }
 
 .drawer {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -307,6 +336,37 @@ const createChat = async () => {
       background-color: var(--surface-hover);
     }
   }
+
+  &__resize-handle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+    width: 6px;
+    cursor: col-resize;
+    touch-action: none;
+    user-select: none;
+    outline: none;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 2px;
+      background-color: var(--q-primary);
+      opacity: 0;
+      transition: opacity 150ms ease;
+    }
+
+    &:hover::after,
+    &:focus-visible::after,
+    &--active::after {
+      opacity: 1;
+    }
+  }
 }
 
 .page-container {
@@ -316,7 +376,25 @@ const createChat = async () => {
 }
 
 :deep(.q-page-container.page-container) {
-  padding-top: 0!important;
+  padding-top: 0 !important;
+}
+
+.layout--resizing {
+  cursor: col-resize;
+  user-select: none;
+
+  :deep(*) {
+    cursor: col-resize !important;
+    user-select: none !important;
+  }
+
+  // Во время перетаскивания граница должна следовать
+  // за курсором без задержки от CSS-переходов
+  :deep(.q-drawer),
+  :deep(.q-page-container),
+  :deep(.q-header) {
+    transition: none !important;
+  }
 }
 
 @media (max-width: 600px) {

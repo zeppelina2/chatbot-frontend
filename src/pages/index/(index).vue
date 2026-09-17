@@ -1,10 +1,19 @@
 <template>
   <q-page class="flex flex-center page-wr">
     <div class="start-page">
-      <TypingLoader
+      <div
+        class="loader-content"
         v-if="loaderStore.isLoading(LoadingType.CREATE_DIALOGUES)"
+      >
+        <TypingLoader />
+        <span class="q-sr-only">
+          Магнус готовит ответ
+        </span>
+      </div>
+      <ChatInput
+        @send="handleCreateDialogue"
+        :disabled="loaderStore.isLoading(LoadingType.CREATE_DIALOGUES)"
       />
-      <ChatInput @send="handleCreateDialogue" />
     </div>
   </q-page>
 </template>
@@ -44,11 +53,16 @@ const handleCreateDialogue = async (message: string) => {
 <style scoped lang="scss">
 .start-page {
   width: 100%;
-  max-width: 900px;
+  max-width: 780px;
   padding: 16px;
 }
 
 .page-wr {
   padding-top: 66px;
 }
+
+.loader-content {
+  margin: 0 0 10px;
+}
+
 </style>

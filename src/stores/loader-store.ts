@@ -6,6 +6,7 @@ export const useLoaderStore = defineStore("loader", {
     loading: {
       [LoadingType.DIALOGUES]: false,
       [LoadingType.MESSAGES]: false,
+      [LoadingType.CREATE_DIALOGUES]: false,
     } as Partial<Record<LoadingType, boolean>>,
 
     generationByChatId: {} as Record<string, boolean>,
