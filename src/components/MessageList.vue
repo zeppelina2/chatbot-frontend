@@ -19,7 +19,7 @@
           <TypingLoader />
 
           <span class="q-sr-only">
-            Магнус готовит ответ
+            Готовит ответ
           </span>
         </div>
       </div>
