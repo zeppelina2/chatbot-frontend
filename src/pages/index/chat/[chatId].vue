@@ -167,6 +167,9 @@ const handleSendMessage = async (content: string) => {
     "sending",
   );
 
+  // Сразу поднимаем диалог, не дожидаясь ответа API
+  dialoguesStore.moveDialogueToTop(currentChatId);
+
   loaderStore.startGeneration(currentChatId);
 
   try {
