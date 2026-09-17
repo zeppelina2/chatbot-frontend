@@ -8,6 +8,7 @@ import { apiGenerateDialogueName } from "@/api/llm";
 export const useDialoguesStore = defineStore("dialogues", {
   state: () => ({
     dialogues: [] as DialogueType[],
+    scrollToTopRequest: 0,
   }),
 
   actions: {
@@ -56,6 +57,26 @@ export const useDialoguesStore = defineStore("dialogues", {
         console.error("Ошибка генерации имени диалога:", error);
         throw error;
       }
+    },
+
+    moveDialogueToTop(chatId: string) {
+      const index = this.dialogues.findIndex(
+        (dialogue) => dialogue.chat_id === chatId,
+      );
+
+      // Диалог не найден или уже находится первым
+      if (index <= 0) {
+        return;
+      }
+
+      const [dialogue] = this.dialogues.splice(index, 1);
+
+      if (!dialogue) {
+        return;
+      }
+
+      this.dialogues.unshift(dialogue);
+      this.scrollToTopRequest += 1;
     },
   },
 });

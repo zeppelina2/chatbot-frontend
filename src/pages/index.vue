@@ -54,7 +54,10 @@
           </button>
         </div>
 
-        <BaseScrollArea class="drawer__dialogues">
+        <BaseScrollArea
+          ref="dialoguesScrollAreaRef"
+          class="drawer__dialogues"
+        >
           <DialogueList />
         </BaseScrollArea>
 
@@ -81,7 +84,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, watch, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 import BaseScrollArea from "@/components/ui/BaseScrollArea.vue";
@@ -117,6 +120,24 @@ const toggleLeftDrawer = () => {
 const createChat = async () => {
   await router.push("/");
 };
+
+// Прокрутка списка диалогов в начало, когда пишем в старом диалоге
+const dialoguesScrollAreaRef =
+  ref<InstanceType<typeof BaseScrollArea> | null>(null);
+
+watch(
+  () => dialoguesStore.scrollToTopRequest,
+  () => {
+    const container =
+      dialoguesScrollAreaRef.value?.getContainer();
+
+    container?.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  },
+  { flush: "post" },
+);
 
 // код для ресайза бокового меню
 const MIN_DRAWER_WIDTH = 240;
