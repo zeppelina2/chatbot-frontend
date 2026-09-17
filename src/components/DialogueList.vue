@@ -4,13 +4,6 @@
     aria-label="Список диалогов"
   >
     <q-list>
-      <!-- <q-item-label
-        header
-        class="dialogue-list__title"
-      >
-        Недавние беседы
-      </q-item-label> -->
-
       <q-item
         v-for="dialogue in dialoguesStore.dialogues"
         :key="dialogue.chat_id"
@@ -20,13 +13,11 @@
         :to="`/chat/${dialogue.chat_id}`"
         active-class="dialogue-list__item--active"
       >
-        <q-item-section>
-          <q-item-label
+        <q-item-section class="dialogue-list__name-section">
+          <OverflowTooltip
             class="dialogue-list__name"
-            :lines="1"
-          >
-            {{ dialogue.name }}
-          </q-item-label>
+            :text="dialogue.name"
+          />
         </q-item-section>
 
         <q-item-section
@@ -59,6 +50,7 @@ import { computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
 
 import { useDialoguesStore } from "@/stores/dialogues-store";
+import OverflowTooltip from "@/components/ui/OverflowTooltip.vue";
 
 const dialoguesStore = useDialoguesStore();
 
@@ -73,15 +65,6 @@ onMounted(() => {
 <style scoped lang="scss">
 .dialogue-list {
   width: 100%;
-
-  // &__title {
-  //   padding: 8px 10px;
-  //   color: var(--text-muted);
-  //   font-size: 12px;
-  //   font-weight: 500;
-  //   letter-spacing: 0.08em;
-  //   text-transform: uppercase;
-  // }
 
   &__item {
     min-height: 40px;
@@ -99,22 +82,21 @@ onMounted(() => {
     }
 
     &--active {
-      // color: var(--text-accent);
       background-color: var(--surface-active);
 
       &:hover {
-        // color: var(--text-accent);
         background-color: var(--surface-active);
       }
     }
   }
 
+  &__name-section {
+    min-width: 0;
+  }
+
   &__name {
-    overflow: hidden;
     font-size: 14px;
     line-height: 1.4;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 
   &__active-icon {
