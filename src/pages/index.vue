@@ -7,7 +7,6 @@ import DialogueList from "@/components/DialogueList.vue";
 import ThemeSwitcher from "@/components/ui/ThemeSwitcher.vue";
 import DialogueActions from "@/components/DialogueActions.vue";
 import { useDialoguesStore } from "@/stores/dialogues-store";
-import { apiDeleteDialogue } from "@/api/dialogues";
 
 const router = useRouter();
 
@@ -30,8 +29,12 @@ const currentDialogueName = computed(() => {
   return currentDialogue?.name ?? "Диалог";
 });
 
-const handleDeleteDialogue = () => {
-  apiDeleteDialogue(currentChatId.value)
+const handleDeleteDialogue = async (chatId: string) => {
+  await dialoguesStore.deleteDialogue(chatId);
+
+  if (currentChatId.value === chatId) {
+    await router.replace("/");
+  }
 };
 
 const toggleLeftDrawer = () => {
@@ -134,10 +137,12 @@ const stopResize = (event: PointerEvent) => {
           </span>
         </q-toolbar-title>
         <ThemeSwitcher class="app-header__theme_switcher" />
-        <DialogueActions
-          v-if="currentChatId"
-          @delete="handleDeleteDialogue"
-        />
+        <q-btn v-if="currentChatId" flat round dense aria-label="Действия с диалогом" aria-haspopup="menu">
+          <img src="/icons/dialogue-sparkle-32.svg" width="25" height="25" alt="" />
+
+          <q-tooltip>Действия с диалогом</q-tooltip>
+          <DialogueActions @delete="() => handleDeleteDialogue(currentChatId)" />
+        </q-btn>
       </q-toolbar>
     </q-header>
 
@@ -178,7 +183,7 @@ const stopResize = (event: PointerEvent) => {
           ref="dialoguesScrollAreaRef"
           class="drawer__dialogues"
         >
-          <DialogueList />
+          <DialogueList @delete="handleDeleteDialogue"/>
         </BaseScrollArea>
 
         <div class="drawer__footer_wr">

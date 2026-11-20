@@ -3,7 +3,12 @@ import { computed, ref, watch, onMounted } from "vue";
 import { useRoute } from "vue-router";
 
 import { useDialoguesStore } from "@/stores/dialogues-store";
+import DialogueActions from "./DialogueActions.vue";
 import OverflowTooltip from "@/components/ui/OverflowTooltip.vue";
+
+const emit = defineEmits<{
+  delete: [chatId: string];
+}>();
 
 const dialoguesStore = useDialoguesStore();
 
@@ -95,6 +100,11 @@ onMounted(() => {
             aria-hidden="true"
           />
         </q-item-section>
+        <DialogueActions
+          context-menu
+          :actions="['delete']"
+          @delete="emit('delete', dialogue.chat_id)"
+        />
       </q-item>
 
       <div
