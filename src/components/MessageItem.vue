@@ -1,3 +1,24 @@
+<script setup lang="ts">
+import MarkdownIt from "markdown-it";
+
+import Role from "@/types/roles";
+import type MessageType from "@/types/message";
+
+defineProps<{
+  message: MessageType;
+}>();
+
+const markdown = new MarkdownIt({
+  html: false,
+  breaks: true,
+  linkify: true,
+});
+
+const renderMarkdown = (content: string) => {
+  return markdown.render(content);
+};
+</script>
+
 <template>
   <!-- Сообщение пользователя -->
   <q-item v-if="message.role === Role.USER" class="message-item message-item--user">
@@ -29,27 +50,6 @@
     </q-item-section>
   </q-item>
 </template>
-
-<script setup lang="ts">
-import MarkdownIt from "markdown-it";
-
-import Role from "@/types/roles";
-import type MessageType from "@/types/message";
-
-defineProps<{
-  message: MessageType;
-}>();
-
-const markdown = new MarkdownIt({
-  html: false,
-  breaks: true,
-  linkify: true,
-});
-
-const renderMarkdown = (content: string) => {
-  return markdown.render(content);
-};
-</script>
 
 <style scoped lang="scss">
 .message-item {

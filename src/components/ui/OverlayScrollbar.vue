@@ -1,18 +1,3 @@
-<template>
-  <div
-    v-if="hasOverflow"
-    class="overlay-scrollbar"
-    :class="{ 'overlay-scrollbar--visible': visible }"
-    aria-hidden="true"
-  >
-    <div
-      class="overlay-scrollbar__thumb"
-      :style="thumbStyle"
-      @pointerdown="handlePointerDown"
-    ></div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import type { CSSProperties } from "vue";
 
@@ -32,6 +17,21 @@ const handlePointerDown = (event: PointerEvent) => {
   emit("thumbPointerDown", event);
 };
 </script>
+
+<template>
+  <div
+    v-if="hasOverflow"
+    class="overlay-scrollbar"
+    :class="{ 'overlay-scrollbar--visible': visible }"
+    aria-hidden="true"
+  >
+    <div
+      class="overlay-scrollbar__thumb"
+      :style="thumbStyle"
+      @pointerdown="handlePointerDown"
+    ></div>
+  </div>
+</template>
 
 <style scoped lang="scss">
 .overlay-scrollbar {

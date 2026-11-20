@@ -1,3 +1,32 @@
+<script setup lang="ts">
+import { ref } from "vue";
+
+interface Props {
+  disabled?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  disabled: false,
+});
+
+const emit = defineEmits<{
+  send: [message: string];
+}>();
+
+const message = ref("");
+
+const sendMessage = () => {
+  const value = message.value.trim();
+
+  if (!value || props.disabled) {
+    return;
+  }
+
+  emit("send", value);
+  message.value = "";
+};
+</script>
+
 <template>
   <div class="chat-input">
     <q-input
@@ -32,35 +61,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import { ref } from "vue";
-
-interface Props {
-  disabled?: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  disabled: false,
-});
-
-const emit = defineEmits<{
-  send: [message: string];
-}>();
-
-const message = ref("");
-
-const sendMessage = () => {
-  const value = message.value.trim();
-
-  if (!value || props.disabled) {
-    return;
-  }
-
-  emit("send", value);
-  message.value = "";
-};
-</script>
 
 <style scoped lang="scss">
 .chat-input {

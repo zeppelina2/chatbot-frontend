@@ -15,3 +15,6 @@ export const apiCreateDialogue = async () =>
       user_id: TEST_USER_ID,
     },
   });
+
+export const apiDeleteDialogue = async (dialogueId: string) =>
+  await api.delete(`/dialogues/${dialogueId}`);

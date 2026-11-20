@@ -1,88 +1,3 @@
-<template>
-  <q-layout view="lHh Lpr lFf" :class="{ 'layout--resizing': isResizing }">
-    <q-header bordered class="app-header">
-      <q-toolbar class="app-header__toolbar">
-        <q-btn class="app-header__menu lt-md" flat round dense icon="menu" aria-label="Открыть меню"
-          @click="toggleLeftDrawer" />
-
-        <q-toolbar-title class="app-header__title">
-          <span class="app-header__dialogue-name">
-            {{ currentDialogueName }}
-          </span>
-
-          <span class="app-header__status">
-            <span class="app-header__status-dot"></span>
-            Готов отвечать
-          </span>
-        </q-toolbar-title>
-        <ThemeSwitcher />
-        <img src="/icons/dialogue-sparkle-32.svg" width="25" height="25" alt="active-dialogue-star"
-          aria-hidden="true" />
-      </q-toolbar>
-    </q-header>
-
-    <q-drawer
-      v-model="leftDrawerOpen"
-      class="app-drawer"
-      show-if-above
-      bordered
-      :width="drawerWidth"
-      :breakpoint="1023"
-    >
-      <div class="drawer">
-        <div class="drawer__brand">
-          <q-avatar class="drawer__avatar" size="38px">
-            <img src="/icons/favicon-96x96.png" alt="" />
-          </q-avatar>
-
-          <div class="drawer__brand-text">
-            <div class="drawer__brand-name">
-              Магнус Фортий
-            </div>
-
-            <div class="drawer__brand-caption">
-              Архив Академии
-            </div>
-          </div>
-        </div>
-
-        <div class="drawer__new-chat-wr">
-          <button class="drawer__new-chat" @click="createChat">
-            <img class="drawer__new-chat-icon" src="/icons/feather.svg" alt="Иконка с пером" aria-hidden="true" />
-
-            <span>Новый разговор</span>
-          </button>
-        </div>
-
-        <BaseScrollArea
-          ref="dialoguesScrollAreaRef"
-          class="drawer__dialogues"
-        >
-          <DialogueList />
-        </BaseScrollArea>
-
-        <div class="drawer__footer_wr">
-          <div class="drawer__footer">
-            <q-btn class="drawer__settings" flat no-caps icon="settings" align="left" label="Настройки" />
-          </div>
-        </div>
-
-        <div class="drawer__resize-handle gt-sm" :class="{ 'drawer__resize-handle--active': isResizing }"
-          role="separator" aria-label="Ширина бокового меню" aria-orientation="vertical" :aria-valuenow="drawerWidth"
-          :aria-valuemin="MIN_DRAWER_WIDTH" :aria-valuemax="MAX_DRAWER_WIDTH" tabindex="0"
-          @pointerdown.prevent.stop="startResize" @pointermove="resizeDrawer" @pointerup="stopResize"
-          @pointercancel="stopResize" @lostpointercapture="stopResize"
-          @keydown.left.prevent="setDrawerWidth(drawerWidth - 10)"
-          @keydown.right.prevent="setDrawerWidth(drawerWidth + 10)"></div>
-      </div>
-    </q-drawer>
-
-    <q-page-container class="page-container">
-      <router-view />
-    </q-page-container>
-  </q-layout>
-</template>
-
 <script setup lang="ts">
 import { computed, watch, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -90,7 +5,9 @@ import { useRoute, useRouter } from "vue-router";
 import BaseScrollArea from "@/components/ui/BaseScrollArea.vue";
 import DialogueList from "@/components/DialogueList.vue";
 import ThemeSwitcher from "@/components/ui/ThemeSwitcher.vue";
+import DialogueActions from "@/components/DialogueActions.vue";
 import { useDialoguesStore } from "@/stores/dialogues-store";
+import { apiDeleteDialogue } from "@/api/dialogues";
 
 const router = useRouter();
 
@@ -112,6 +29,10 @@ const currentDialogueName = computed(() => {
 
   return currentDialogue?.name ?? "Диалог";
 });
+
+const handleDeleteDialogue = () => {
+  apiDeleteDialogue(currentChatId.value)
+};
 
 const toggleLeftDrawer = () => {
   leftDrawerOpen.value = !leftDrawerOpen.value;
@@ -195,6 +116,93 @@ const stopResize = (event: PointerEvent) => {
 };
 </script>
 
+<template>
+  <q-layout view="lHh Lpr lFf" :class="{ 'layout--resizing': isResizing }">
+    <q-header bordered class="app-header">
+      <q-toolbar class="app-header__toolbar">
+        <q-btn class="app-header__menu lt-md" flat round dense icon="menu" aria-label="Открыть меню"
+          @click="toggleLeftDrawer" />
+
+        <q-toolbar-title class="app-header__title">
+          <span class="app-header__dialogue-name">
+            {{ currentDialogueName }}
+          </span>
+
+          <span class="app-header__status">
+            <span class="app-header__status-dot"></span>
+            Готов отвечать
+          </span>
+        </q-toolbar-title>
+        <ThemeSwitcher class="app-header__theme_switcher" />
+        <DialogueActions
+          v-if="currentChatId"
+          @delete="handleDeleteDialogue"
+        />
+      </q-toolbar>
+    </q-header>
+
+    <q-drawer
+      v-model="leftDrawerOpen"
+      class="app-drawer"
+      show-if-above
+      bordered
+      :width="drawerWidth"
+      :breakpoint="1023"
+    >
+      <div class="drawer">
+        <div class="drawer__brand">
+          <q-avatar class="drawer__avatar" size="38px">
+            <img src="/icons/favicon-96x96.png" alt="" />
+          </q-avatar>
+
+          <div class="drawer__brand-text">
+            <div class="drawer__brand-name">
+              Магнус Фортий
+            </div>
+
+            <div class="drawer__brand-caption">
+              Архив Академии
+            </div>
+          </div>
+        </div>
+
+        <div class="drawer__new-chat-wr">
+          <button class="drawer__new-chat" @click="createChat">
+            <img class="drawer__new-chat-icon" src="/icons/feather.svg" alt="Иконка с пером" aria-hidden="true" />
+
+            <span>Новый разговор</span>
+          </button>
+        </div>
+
+        <BaseScrollArea
+          ref="dialoguesScrollAreaRef"
+          class="drawer__dialogues"
+        >
+          <DialogueList />
+        </BaseScrollArea>
+
+        <div class="drawer__footer_wr">
+          <div class="drawer__footer">
+            <q-btn class="drawer__settings" flat no-caps icon="settings" align="left" label="Настройки" />
+          </div>
+        </div>
+
+        <div class="drawer__resize-handle gt-sm" :class="{ 'drawer__resize-handle--active': isResizing }"
+          role="separator" aria-label="Ширина бокового меню" aria-orientation="vertical" :aria-valuenow="drawerWidth"
+          :aria-valuemin="MIN_DRAWER_WIDTH" :aria-valuemax="MAX_DRAWER_WIDTH" tabindex="0"
+          @pointerdown.prevent.stop="startResize" @pointermove="resizeDrawer" @pointerup="stopResize"
+          @pointercancel="stopResize" @lostpointercapture="stopResize"
+          @keydown.left.prevent="setDrawerWidth(drawerWidth - 10)"
+          @keydown.right.prevent="setDrawerWidth(drawerWidth + 10)"></div>
+      </div>
+    </q-drawer>
+
+    <q-page-container class="page-container">
+      <router-view />
+    </q-page-container>
+  </q-layout>
+</template>
+
 <style scoped lang="scss">
 .app-header {
   color: var(--text-primary);
@@ -250,6 +258,10 @@ const stopResize = (event: PointerEvent) => {
     margin-left: 16px;
     color: var(--q-primary);
     font-size: 21px;
+  }
+
+  &__theme_switcher {
+    margin: 0 15px 0 0;
   }
 }
 

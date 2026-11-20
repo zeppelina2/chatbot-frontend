@@ -1,23 +1,3 @@
-<template>
-  <div class="overflow-tooltip">
-    <div
-      ref="textRef"
-      class="overflow-tooltip__text"
-    >
-      {{ text }}
-    </div>
-
-    <q-tooltip
-      v-if="isOverflowing"
-      :delay="300"
-      max-width="235px"
-      class="overflow-tooltip__popup"
-    >
-      {{ text }}
-    </q-tooltip>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 
@@ -59,6 +39,26 @@ onBeforeUnmount(() => {
   resizeObserver?.disconnect();
 });
 </script>
+
+<template>
+  <div class="overflow-tooltip">
+    <div
+      ref="textRef"
+      class="overflow-tooltip__text"
+    >
+      {{ text }}
+    </div>
+
+    <q-tooltip
+      v-if="isOverflowing"
+      :delay="300"
+      max-width="235px"
+      class="overflow-tooltip__popup"
+    >
+      {{ text }}
+    </q-tooltip>
+  </div>
+</template>
 
 <style scoped lang="scss">
 .overflow-tooltip {
