@@ -1,23 +1,3 @@
-<template>
-  <q-page class="flex flex-center page-wr">
-    <div class="start-page">
-      <div
-        class="loader-content"
-        v-if="loaderStore.isLoading(LoadingType.CREATE_DIALOGUES)"
-      >
-        <TypingLoader />
-        <span class="q-sr-only">
-          Магнус готовит ответ
-        </span>
-      </div>
-      <ChatInput
-        @send="handleCreateDialogue"
-        :disabled="loaderStore.isLoading(LoadingType.CREATE_DIALOGUES)"
-      />
-    </div>
-  </q-page>
-</template>
-
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 
@@ -49,6 +29,26 @@ const handleCreateDialogue = async (message: string) => {
   }
 };
 </script>
+
+<template>
+  <q-page class="flex flex-center page-wr">
+    <div class="start-page">
+      <div
+        class="loader-content"
+        v-if="loaderStore.isLoading(LoadingType.CREATE_DIALOGUES)"
+      >
+        <TypingLoader />
+        <span class="q-sr-only">
+          Магнус готовит ответ
+        </span>
+      </div>
+      <ChatInput
+        @send="handleCreateDialogue"
+        :disabled="loaderStore.isLoading(LoadingType.CREATE_DIALOGUES)"
+      />
+    </div>
+  </q-page>
+</template>
 
 <style scoped lang="scss">
 .start-page {

@@ -1,3 +1,24 @@
+<script setup lang="ts">
+import { computed } from "vue";
+
+import MessageItem from "@/components/MessageItem.vue";
+import TypingLoader from "@/components/ui/TypingLoader.vue";
+import { useLoaderStore } from "@/stores/loader-store";
+
+import type MessageType from "@/types/message";
+
+const props = defineProps<{
+  messages: MessageType[];
+  chatId: string;
+}>();
+
+const loaderStore = useLoaderStore();
+
+const isGenerationLoading = computed(() =>
+  loaderStore.isGenerationLoading(props.chatId),
+);
+</script>
+
 <template>
   <q-list class="message-list" :aria-busy="isGenerationLoading">
     <div class="message-list__messages">
@@ -26,27 +47,6 @@
     </div>
   </q-list>
 </template>
-
-<script setup lang="ts">
-import { computed } from "vue";
-
-import MessageItem from "@/components/MessageItem.vue";
-import TypingLoader from "@/components/ui/TypingLoader.vue";
-import { useLoaderStore } from "@/stores/loader-store";
-
-import type MessageType from "@/types/message";
-
-const props = defineProps<{
-  messages: MessageType[];
-  chatId: string;
-}>();
-
-const loaderStore = useLoaderStore();
-
-const isGenerationLoading = computed(() =>
-  loaderStore.isGenerationLoading(props.chatId),
-);
-</script>
 
 <style scoped lang="scss">
 .message-list {

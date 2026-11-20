@@ -1,27 +1,3 @@
-<template>
-  <div
-    class="scroll-area"
-    @pointerenter="handlePointerEnter"
-    @pointerleave="handlePointerLeave"
-  >
-    <div
-      ref="containerRef"
-      class="scroll-area__container"
-      tabindex="0"
-      @scroll="handleScroll"
-    >
-      <slot></slot>
-    </div>
-
-    <OverlayScrollbar
-      :has-overflow="hasOverflow"
-      :visible="isVisible"
-      :thumb-style="thumbStyle"
-      @thumb-pointer-down="handleThumbPointerDown"
-    />
-  </div>
-</template>
-
 <script setup lang="ts">
 import { ref } from "vue";
 
@@ -55,6 +31,30 @@ defineExpose({
   getContainer,
 });
 </script>
+
+<template>
+  <div
+    class="scroll-area"
+    @pointerenter="handlePointerEnter"
+    @pointerleave="handlePointerLeave"
+  >
+    <div
+      ref="containerRef"
+      class="scroll-area__container"
+      tabindex="0"
+      @scroll="handleScroll"
+    >
+      <slot></slot>
+    </div>
+
+    <OverlayScrollbar
+      :has-overflow="hasOverflow"
+      :visible="isVisible"
+      :thumb-style="thumbStyle"
+      @thumb-pointer-down="handleThumbPointerDown"
+    />
+  </div>
+</template>
 
 <style scoped lang="scss">
 .scroll-area {

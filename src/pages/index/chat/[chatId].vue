@@ -1,27 +1,3 @@
-<template>
-  <q-page class="chat-page">
-    <BaseScrollArea
-      ref="scrollAreaRef"
-      class="chat-page__scroll-area"
-      @scroll="updateScrollPosition"
-    >
-      <div class="chat-page__messages">
-        <MessageList
-          :messages="messages"
-          :chat-id="chatId"
-        />
-      </div>
-    </BaseScrollArea>
-
-    <div class="chat-page__input">
-      <ChatInput
-        @send="handleSendMessage"
-        :disabled="isGenerationLoading"
-      />
-    </div>
-  </q-page>
-</template>
-
 <script setup lang="ts">
 import { computed, ref, watch, nextTick } from "vue";
 import { useRoute } from "vue-router";
@@ -233,6 +209,30 @@ watch(
   { immediate: true },
 );
 </script>
+
+<template>
+  <q-page class="chat-page">
+    <BaseScrollArea
+      ref="scrollAreaRef"
+      class="chat-page__scroll-area"
+      @scroll="updateScrollPosition"
+    >
+      <div class="chat-page__messages">
+        <MessageList
+          :messages="messages"
+          :chat-id="chatId"
+        />
+      </div>
+    </BaseScrollArea>
+
+    <div class="chat-page__input">
+      <ChatInput
+        @send="handleSendMessage"
+        :disabled="isGenerationLoading"
+      />
+    </div>
+  </q-page>
+</template>
 
 <style scoped lang="scss">
 .chat-page {

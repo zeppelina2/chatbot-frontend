@@ -1,3 +1,20 @@
+<script setup lang="ts">
+import { computed, onMounted } from "vue";
+import { useRoute } from "vue-router";
+
+import { useDialoguesStore } from "@/stores/dialogues-store";
+import OverflowTooltip from "@/components/ui/OverflowTooltip.vue";
+
+const dialoguesStore = useDialoguesStore();
+
+const route = useRoute("//chat/[chatId]");
+const currentChatId = computed(() => route.params.chatId);
+
+onMounted(() => {
+  dialoguesStore.loadDialogues();
+});
+</script>
+
 <template>
   <nav
     class="dialogue-list"
@@ -44,23 +61,6 @@
     </q-list>
   </nav>
 </template>
-
-<script setup lang="ts">
-import { computed, onMounted } from "vue";
-import { useRoute } from "vue-router";
-
-import { useDialoguesStore } from "@/stores/dialogues-store";
-import OverflowTooltip from "@/components/ui/OverflowTooltip.vue";
-
-const dialoguesStore = useDialoguesStore();
-
-const route = useRoute("//chat/[chatId]");
-const currentChatId = computed(() => route.params.chatId);
-
-onMounted(() => {
-  dialoguesStore.loadDialogues();
-});
-</script>
 
 <style scoped lang="scss">
 .dialogue-list {
@@ -113,6 +113,7 @@ onMounted(() => {
     color: var(--text-muted);
     font-size: 13px;
     line-height: 1.5;
+    text-align: center;
   }
 }
 </style>
