@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import { computed, ref, watch, onMounted } from "vue";
 import { useRoute } from "vue-router";
 
 import { useDialoguesStore } from "@/stores/dialogues-store";
@@ -10,6 +10,50 @@ const dialoguesStore = useDialoguesStore();
 const route = useRoute("//chat/[chatId]");
 const currentChatId = computed(() => route.params.chatId);
 
+const listRef = ref<HTMLElement | null>(null);
+
+onMounted(() => {
+  const initialChatId = currentChatId.value;
+
+  if (!initialChatId) return;
+
+  const scrollToInitialDialogue = () => {
+    const item = listRef.value?.querySelector<HTMLElement>(
+      ".dialogue-list__item--active",
+    );
+
+    item?.scrollIntoView({ block: "nearest", inline: "nearest" });
+  };
+
+  const hasInitialDialogue = () =>
+    dialoguesStore.dialogues.some(
+      (dialogue) => dialogue.chat_id === initialChatId,
+    );
+
+  // Если список уже отрисован, можно прокрутить сразу.
+  if (hasInitialDialogue()) {
+    scrollToInitialDialogue();
+    return;
+  }
+
+  // После обновления страницы список обычно ещё загружается.
+  const stop = watch(
+    [hasInitialDialogue, currentChatId],
+    ([hasDialogue, chatId]) => {
+      if (chatId !== initialChatId) {
+        stop();
+        return;
+      }
+
+      if (hasDialogue) {
+        scrollToInitialDialogue();
+        stop();
+      }
+    },
+    { flush: "post" },
+  );
+});
+
 onMounted(() => {
   dialoguesStore.loadDialogues();
 });
@@ -17,6 +61,7 @@ onMounted(() => {
 
 <template>
   <nav
+    ref="listRef"
     class="dialogue-list"
     aria-label="Список диалогов"
   >
