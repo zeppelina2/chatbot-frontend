@@ -2,7 +2,7 @@ import { defineStore, acceptHMRUpdate } from "pinia";
 
 import DialogueType from "@/types/dialogue";
 
-import { apiDialogueList, apiCreateDialogue } from "@/api/dialogues";
+import { apiDialogueList, apiCreateDialogue, apiDeleteDialogue } from "@/api/dialogues";
 import { apiGenerateDialogueName } from "@/api/llm";
 
 export const useDialoguesStore = defineStore("dialogues", {
@@ -33,6 +33,21 @@ export const useDialoguesStore = defineStore("dialogues", {
         return dialogue;
       } catch (error) {
         console.error("Ошибка создания диалога:", error);
+        throw error;
+      }
+    },
+
+    async deleteDialogue(chatId: string) {
+      try {
+        await apiDeleteDialogue(chatId);
+
+        this.dialogues = this.dialogues.filter(
+          (dialogue) => dialogue.chat_id !== chatId,
+        );
+
+        return chatId;
+      } catch (error) {
+        console.error("Не удалось удалить диалог:", error);
         throw error;
       }
     },

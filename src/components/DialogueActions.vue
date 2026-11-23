@@ -1,57 +1,49 @@
 <script setup lang="ts">
+type DialogueAction = "delete";
+
 withDefaults(
   defineProps<{
-    deleteDisabled?: boolean
+    actions?: readonly DialogueAction[];
+    contextMenu?: boolean;
+    deleteDisabled?: boolean;
   }>(),
   {
+    actions: () => ["delete"] as DialogueAction[],
+    contextMenu: false,
     deleteDisabled: false,
   },
-)
+);
 
 const emit = defineEmits<{
-  delete: []
-}>()
+  delete: [];
+}>();
 </script>
 
 <template>
-  <q-btn
-    flat
-    round
-    dense
-    aria-label="Действия с диалогом"
+  <q-menu
+    v-if="actions.length"
+    :context-menu="contextMenu"
+    :touch-position="contextMenu"
+    anchor="bottom right"
+    self="top right"
+    :offset="contextMenu ? [0, 0] : [0, 8]"
   >
-    <img
-      src="/icons/dialogue-sparkle-32.svg"
-      width="25"
-      height="25"
-      alt=""
-      aria-hidden="true"
-    />
+    <q-list role="menu" style="min-width: 200px">
+      <q-item
+        v-if="actions.includes('delete')"
+        role="menuitem"
+        clickable
+        v-close-popup
+        class="text-negative"
+        :disable="deleteDisabled"
+        @click="emit('delete')"
+      >
+        <q-item-section avatar>
+          <q-icon name="delete_outline" />
+        </q-item-section>
 
-    <q-tooltip>Действия с диалогом</q-tooltip>
-
-    <q-menu
-      anchor="bottom right"
-      self="top right"
-      :offset="[0, 8]"
-    >
-      <q-list style="min-width: 200px">
-        <q-item
-          clickable
-          v-close-popup
-          class="text-negative"
-          :disable="deleteDisabled"
-          @click="emit('delete')"
-        >
-          <q-item-section avatar>
-            <q-icon name="delete_outline" />
-          </q-item-section>
-
-          <q-item-section>
-            Удалить диалог
-          </q-item-section>
-        </q-item>
-      </q-list>
-    </q-menu>
-  </q-btn>
+        <q-item-section>Удалить диалог</q-item-section>
+      </q-item>
+    </q-list>
+  </q-menu>
 </template>

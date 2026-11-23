@@ -7,13 +7,16 @@ import DialogueList from "@/components/DialogueList.vue";
 import ThemeSwitcher from "@/components/ui/ThemeSwitcher.vue";
 import DialogueActions from "@/components/DialogueActions.vue";
 import { useDialoguesStore } from "@/stores/dialogues-store";
-import { apiDeleteDialogue } from "@/api/dialogues";
 
 const router = useRouter();
 
 const dialoguesStore = useDialoguesStore();
 
 const leftDrawerOpen = ref(false);
+const isDeleteDialogOpen = ref(false);
+const chatIdToDelete = ref<string | null>(null);
+const isDeleting = ref(false);
+const deleteError = ref("");
 
 const route = useRoute("//chat/[chatId]");
 const currentChatId = computed(() => route.params.chatId);
@@ -30,8 +33,34 @@ const currentDialogueName = computed(() => {
   return currentDialogue?.name ?? "Диалог";
 });
 
-const handleDeleteDialogue = () => {
-  apiDeleteDialogue(currentChatId.value)
+const openDeleteDialog = (chatId: string) => {
+  chatIdToDelete.value = chatId;
+  deleteError.value = "";
+  isDeleteDialogOpen.value = true;
+};
+
+const confirmDeleteDialogue = async () => {
+  const chatId = chatIdToDelete.value;
+  if (!chatId || isDeleting.value) return;
+
+  isDeleting.value = true;
+  deleteError.value = "";
+
+  try {
+    await dialoguesStore.deleteDialogue(chatId);
+  } catch {
+    deleteError.value = "Не удалось удалить диалог. Попробуй ещё раз.";
+    return;
+  } finally {
+    isDeleting.value = false;
+  }
+
+  isDeleteDialogOpen.value = false;
+  chatIdToDelete.value = null;
+
+  if (currentChatId.value === chatId) {
+    await router.replace("/");
+  }
 };
 
 const toggleLeftDrawer = () => {
@@ -134,10 +163,12 @@ const stopResize = (event: PointerEvent) => {
           </span>
         </q-toolbar-title>
         <ThemeSwitcher class="app-header__theme_switcher" />
-        <DialogueActions
-          v-if="currentChatId"
-          @delete="handleDeleteDialogue"
-        />
+        <q-btn v-if="currentChatId" flat round dense aria-label="Действия с диалогом" aria-haspopup="menu">
+          <img src="/icons/dialogue-sparkle-32.svg" width="25" height="25" alt="" />
+
+          <q-tooltip>Действия с диалогом</q-tooltip>
+          <DialogueActions @delete="openDeleteDialog(currentChatId)" />
+        </q-btn>
       </q-toolbar>
     </q-header>
 
@@ -178,7 +209,7 @@ const stopResize = (event: PointerEvent) => {
           ref="dialoguesScrollAreaRef"
           class="drawer__dialogues"
         >
-          <DialogueList />
+          <DialogueList @delete="openDeleteDialog"/>
         </BaseScrollArea>
 
         <div class="drawer__footer_wr">
@@ -200,6 +231,43 @@ const stopResize = (event: PointerEvent) => {
     <q-page-container class="page-container">
       <router-view />
     </q-page-container>
+    <q-dialog
+      v-model="isDeleteDialogOpen"
+      :persistent="isDeleting"
+      aria-labelledby="delete-dialog-title"
+    >
+      <q-card style="width: 360px; max-width: 100%">
+        <q-card-section>
+          <h2 id="delete-dialog-title" class="text-h6 q-my-none">
+            Удалить диалог?
+          </h2>
+
+          <p v-if="deleteError" class="text-negative q-mb-none q-mt-sm" role="alert">
+            {{ deleteError }}
+          </p>
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn
+            flat
+            no-caps
+            autofocus
+            label="Нет"
+            :disable="isDeleting"
+            @click="isDeleteDialogOpen = false"
+          />
+
+          <q-btn
+            unelevated
+            no-caps
+            class="delete-dialog__confirm"
+            label="Да"
+            :loading="isDeleting"
+            @click="confirmDeleteDialogue"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-layout>
 </template>
 
@@ -428,6 +496,11 @@ const stopResize = (event: PointerEvent) => {
   :deep(.q-header) {
     transition: none !important;
   }
+}
+
+.delete-dialog__confirm {
+  background-color: var(--q-accent);
+  color: var(--invert-text-primary);
 }
 
 @media (max-width: 600px) {
