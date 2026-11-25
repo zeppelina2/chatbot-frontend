@@ -2,6 +2,7 @@
 import { computed, watch, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
+import AuthGate from "@/components/AuthGate.vue";
 import BaseScrollArea from "@/components/ui/BaseScrollArea.vue";
 import DialogueList from "@/components/DialogueList.vue";
 import ThemeSwitcher from "@/components/ui/ThemeSwitcher.vue";
@@ -18,8 +19,12 @@ const chatIdToDelete = ref<string | null>(null);
 const isDeleting = ref(false);
 const deleteError = ref("");
 
-const route = useRoute("//chat/[chatId]");
-const currentChatId = computed(() => route.params.chatId);
+const route = useRoute();
+const isSettings = computed(() => /^\/settings\/?$/.test(route.path));
+const currentChatId = computed(() => {
+  const params = route.params;
+  return "chatId" in params && typeof params.chatId === "string" ? params.chatId : undefined;
+});
 
 const currentDialogueName = computed(() => {
   if (!currentChatId.value) {
@@ -146,129 +151,131 @@ const stopResize = (event: PointerEvent) => {
 </script>
 
 <template>
-  <q-layout view="lHh Lpr lFf" :class="{ 'layout--resizing': isResizing }">
-    <q-header bordered class="app-header">
-      <q-toolbar class="app-header__toolbar">
-        <q-btn class="app-header__menu lt-md" flat round dense icon="menu" aria-label="Открыть меню"
-          @click="toggleLeftDrawer" />
+  <AuthGate>
+    <q-layout view="lHh Lpr lFf" :class="{ 'layout--resizing': isResizing }">
+      <q-header bordered class="app-header">
+        <q-toolbar class="app-header__toolbar">
+          <q-btn class="app-header__menu lt-md" flat round dense icon="menu" aria-label="Открыть меню"
+            @click="toggleLeftDrawer" />
 
-        <q-toolbar-title class="app-header__title">
-          <span class="app-header__dialogue-name">
-            {{ currentDialogueName }}
-          </span>
+          <q-toolbar-title class="app-header__title">
+            <span class="app-header__dialogue-name">
+              {{ isSettings ? "Настройки" : currentDialogueName }}
+            </span>
 
-          <span class="app-header__status">
-            <span class="app-header__status-dot"></span>
-            Готов отвечать
-          </span>
-        </q-toolbar-title>
-        <ThemeSwitcher class="app-header__theme_switcher" />
-        <q-btn v-if="currentChatId" flat round dense aria-label="Действия с диалогом" aria-haspopup="menu">
-          <img src="/icons/dialogue-sparkle-32.svg" width="25" height="25" alt="" />
+            <span v-if="!isSettings" class="app-header__status">
+              <span class="app-header__status-dot"></span>
+              Готов отвечать
+            </span>
+          </q-toolbar-title>
+          <ThemeSwitcher class="app-header__theme_switcher" />
+          <q-btn v-if="currentChatId" flat round dense aria-label="Действия с диалогом" aria-haspopup="menu">
+            <img src="/icons/dialogue-sparkle-32.svg" width="25" height="25" alt="" />
 
-          <q-tooltip>Действия с диалогом</q-tooltip>
-          <DialogueActions @delete="openDeleteDialog(currentChatId)" />
-        </q-btn>
-      </q-toolbar>
-    </q-header>
+            <q-tooltip>Действия с диалогом</q-tooltip>
+            <DialogueActions @delete="openDeleteDialog(currentChatId)" />
+          </q-btn>
+        </q-toolbar>
+      </q-header>
 
-    <q-drawer
-      v-model="leftDrawerOpen"
-      class="app-drawer"
-      show-if-above
-      bordered
-      :width="drawerWidth"
-      :breakpoint="1023"
-    >
-      <div class="drawer">
-        <div class="drawer__brand">
-          <q-avatar class="drawer__avatar" size="38px">
-            <img src="/icons/favicon-96x96.png" alt="" />
-          </q-avatar>
+      <q-drawer
+        v-model="leftDrawerOpen"
+        class="app-drawer"
+        show-if-above
+        bordered
+        :width="drawerWidth"
+        :breakpoint="1023"
+      >
+        <div class="drawer">
+          <div class="drawer__brand">
+            <q-avatar class="drawer__avatar" size="38px">
+              <img src="/icons/favicon-96x96.png" alt="" />
+            </q-avatar>
 
-          <div class="drawer__brand-text">
-            <div class="drawer__brand-name">
-              Магнус Фортий
-            </div>
+            <div class="drawer__brand-text">
+              <div class="drawer__brand-name">
+                Магнус Фортий
+              </div>
 
-            <div class="drawer__brand-caption">
-              Архив Академии
+              <div class="drawer__brand-caption">
+                Архив Академии
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="drawer__new-chat-wr">
-          <button class="drawer__new-chat" @click="createChat">
-            <img class="drawer__new-chat-icon" src="/icons/feather.svg" alt="Иконка с пером" aria-hidden="true" />
+          <div class="drawer__new-chat-wr">
+            <button class="drawer__new-chat" @click="createChat">
+              <img class="drawer__new-chat-icon" src="/icons/feather.svg" alt="Иконка с пером" aria-hidden="true" />
 
-            <span>Новый разговор</span>
-          </button>
-        </div>
-
-        <BaseScrollArea
-          ref="dialoguesScrollAreaRef"
-          class="drawer__dialogues"
-        >
-          <DialogueList @delete="openDeleteDialog"/>
-        </BaseScrollArea>
-
-        <div class="drawer__footer_wr">
-          <div class="drawer__footer">
-            <q-btn class="drawer__settings" flat no-caps icon="settings" align="left" label="Настройки" />
+              <span>Новый разговор</span>
+            </button>
           </div>
+
+          <BaseScrollArea
+            ref="dialoguesScrollAreaRef"
+            class="drawer__dialogues"
+          >
+            <DialogueList @delete="openDeleteDialog"/>
+          </BaseScrollArea>
+
+          <div class="drawer__footer_wr">
+            <div class="drawer__footer">
+              <q-btn class="drawer__settings" flat no-caps icon="settings" align="left" label="Настройки" to="/settings" />
+            </div>
+          </div>
+
+          <div class="drawer__resize-handle gt-sm" :class="{ 'drawer__resize-handle--active': isResizing }"
+            role="separator" aria-label="Ширина бокового меню" aria-orientation="vertical" :aria-valuenow="drawerWidth"
+            :aria-valuemin="MIN_DRAWER_WIDTH" :aria-valuemax="MAX_DRAWER_WIDTH" tabindex="0"
+            @pointerdown.prevent.stop="startResize" @pointermove="resizeDrawer" @pointerup="stopResize"
+            @pointercancel="stopResize" @lostpointercapture="stopResize"
+            @keydown.left.prevent="setDrawerWidth(drawerWidth - 10)"
+            @keydown.right.prevent="setDrawerWidth(drawerWidth + 10)"></div>
         </div>
+      </q-drawer>
 
-        <div class="drawer__resize-handle gt-sm" :class="{ 'drawer__resize-handle--active': isResizing }"
-          role="separator" aria-label="Ширина бокового меню" aria-orientation="vertical" :aria-valuenow="drawerWidth"
-          :aria-valuemin="MIN_DRAWER_WIDTH" :aria-valuemax="MAX_DRAWER_WIDTH" tabindex="0"
-          @pointerdown.prevent.stop="startResize" @pointermove="resizeDrawer" @pointerup="stopResize"
-          @pointercancel="stopResize" @lostpointercapture="stopResize"
-          @keydown.left.prevent="setDrawerWidth(drawerWidth - 10)"
-          @keydown.right.prevent="setDrawerWidth(drawerWidth + 10)"></div>
-      </div>
-    </q-drawer>
+      <q-page-container class="page-container">
+        <router-view />
+      </q-page-container>
+      <q-dialog
+        v-model="isDeleteDialogOpen"
+        :persistent="isDeleting"
+        aria-labelledby="delete-dialog-title"
+      >
+        <q-card style="width: 360px; max-width: 100%">
+          <q-card-section>
+            <h2 id="delete-dialog-title" class="text-h6 q-my-none">
+              Удалить диалог?
+            </h2>
 
-    <q-page-container class="page-container">
-      <router-view />
-    </q-page-container>
-    <q-dialog
-      v-model="isDeleteDialogOpen"
-      :persistent="isDeleting"
-      aria-labelledby="delete-dialog-title"
-    >
-      <q-card style="width: 360px; max-width: 100%">
-        <q-card-section>
-          <h2 id="delete-dialog-title" class="text-h6 q-my-none">
-            Удалить диалог?
-          </h2>
+            <p v-if="deleteError" class="text-negative q-mb-none q-mt-sm" role="alert">
+              {{ deleteError }}
+            </p>
+          </q-card-section>
 
-          <p v-if="deleteError" class="text-negative q-mb-none q-mt-sm" role="alert">
-            {{ deleteError }}
-          </p>
-        </q-card-section>
+          <q-card-actions align="right">
+            <q-btn
+              flat
+              no-caps
+              autofocus
+              label="Нет"
+              :disable="isDeleting"
+              @click="isDeleteDialogOpen = false"
+            />
 
-        <q-card-actions align="right">
-          <q-btn
-            flat
-            no-caps
-            autofocus
-            label="Нет"
-            :disable="isDeleting"
-            @click="isDeleteDialogOpen = false"
-          />
-
-          <q-btn
-            unelevated
-            no-caps
-            class="delete-dialog__confirm"
-            label="Да"
-            :loading="isDeleting"
-            @click="confirmDeleteDialogue"
-          />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
-  </q-layout>
+            <q-btn
+              unelevated
+              no-caps
+              class="delete-dialog__confirm"
+              label="Да"
+              :loading="isDeleting"
+              @click="confirmDeleteDialogue"
+            />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
+    </q-layout>
+  </AuthGate>
 </template>
 
 <style scoped lang="scss">
